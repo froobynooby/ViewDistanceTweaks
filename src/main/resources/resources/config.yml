@@ -1,0 +1,61 @@
+# Please don't change this!
+version: 1
+
+# Set this to true to enable the plugin. The plugin is initially disabled so that you can make changes to the config
+# appropriate to your server.
+enabled: false
+
+
+# Set this to the maximum chunk count your server can handle. The view distance of each world will be adjusted such that
+# the total number of player-loaded chunks is sitting as close to this value as possible.
+#  * If you know your server can handle up to p many players with a view distance of d, a reasonable choice is to set
+#    this to (2d + 1)^2 * p.
+#  * As an example, 5780 is the number of player-loaded chunks for 20 players with a view distance of 8.
+global-chunk-count-target: 5780
+
+# Every how many ticks should we check whether the view distance needs to be updated?
+ticks-per-check: 1200
+
+# How many checks in a row that say to increase the view distance should be required before the view distance is
+# actually increased?
+#  * This is useful as it guards against the following kind of case: A player leaves and the view distance is increased,
+#    but the player returns three minutes later and the view distance is lowered to its previous value.
+#  * Since increasing the view distance can cause lag-spikes for players with poorer connections, it is recommended to
+#    keep this value relatively high.
+passed-checks-for-increase: 10
+
+# How many checks in a row that say to decrease the view distance should be required before the view distance is
+# actually decreased?
+passed-checks-for-decrease: 1
+
+# In order to be less jarring, the view distance is periodically incremented or decremented by 1 until it reaches
+# its target value. Every how many ticks should we increment or decrement the view distance?
+#  * Setting to 0 will cause the view distance to immediately change to its target value, even if this means jumping
+#    from 4 to 32.
+#  * Having this set relatively high will also reduce lag-spikes that players with poorer connections will experience
+#    when the view distance is increased.
+smooth-change-period: 300
+
+# These settings can be specified per world. If a world is not specified or if a setting is missing, it will use the
+# settings listed under the default section.
+world-settings:
+  default:
+    # What should the absolute minimum view distance be in this world?
+    minimum-view-distance: 6
+
+    # What should the absolute maximum view distance be in this world?
+    maximum-view-distance: 16
+
+    # Relative to the other worlds, how 'heavy' is a chunk on performance?
+    #  * For example: In the End dimension, about half of the chunks you encounter are void and so have very little
+    #    impact on performance. For this reason, you may want to set the chunk-weight of the End to 0.5.
+    chunk-weight: 1
+
+#  world_nether:
+#    minimum-view-distance: 6
+#    maximum-view-distance: 10
+
+#  world_the_end:
+#    minimum-view-distance: 6
+#    maximum-view-distance: 10
+#    chunk-weight: 0.5
