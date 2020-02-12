@@ -10,9 +10,14 @@ import java.nio.file.Files;
 import java.util.Objects;
 
 public class Config {
+    private ViewDistanceTweaks viewDistanceTweaks;
     private YamlConfiguration yamlConfiguration;
 
-    public Config(ViewDistanceTweaks viewDistanceTweaks) throws IOException {
+    public Config(ViewDistanceTweaks viewDistanceTweaks) {
+        this.viewDistanceTweaks = viewDistanceTweaks;
+    }
+
+    public void load() throws IOException {
         File configFile = new File(viewDistanceTweaks.getDataFolder(), "config.yml");
         if (!configFile.exists()) {
             configFile.getParentFile().mkdirs();
@@ -62,6 +67,10 @@ public class Config {
 
     public int getPassedChecksForDecrease() {
         return yamlConfiguration.getInt("passed-checks-for-decrease");
+    }
+
+    public boolean logViewDistanceChangs() {
+        return yamlConfiguration.getBoolean("log-view-distance-changes");
     }
 
 }

@@ -14,7 +14,7 @@ enabled: false
 global-chunk-count-target: 5780
 
 # Every how many ticks should we check whether the view distance needs to be updated?
-ticks-per-check: 1200
+ticks-per-check: 600
 
 # How many checks in a row that say to increase the view distance should be required before the view distance is
 # actually increased?
@@ -35,6 +35,9 @@ passed-checks-for-decrease: 1
 #  * Having this set relatively high will also reduce lag-spikes that players with poorer connections will experience
 #    when the view distance is increased.
 smooth-change-period: 300
+
+# Should we send a message to the console when we change the view distance?
+log-view-distance-changes: true
 
 # These settings can be specified per world. If a world is not specified or if a setting is missing, it will use the
 # settings listed under the default section.

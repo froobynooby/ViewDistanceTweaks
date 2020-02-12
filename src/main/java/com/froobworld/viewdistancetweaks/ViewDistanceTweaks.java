@@ -1,7 +1,9 @@
 package com.froobworld.viewdistancetweaks;
 
+import com.froobworld.viewdistancetweaks.command.VdtCommand;
 import com.froobworld.viewdistancetweaks.config.Config;
 import com.froobworld.viewdistancetweaks.limiter.ViewDistanceLimiter;
+import com.froobworld.viewdistancetweaks.util.ViewDistanceUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -13,7 +15,16 @@ public class ViewDistanceTweaks extends JavaPlugin {
     @Override
     public void onEnable() {
         try {
-            config = new Config(this);
+            Class.forName("org.spigotmc.SpigotConfig");
+        } catch (Exception ex) {
+            getLogger().severe("ViewDistanceTweaks requires Spigot (or a fork such as Paper) in order to run.");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        config = new Config(this);
+        try {
+            config.load();
         } catch (IOException e) {
             e.printStackTrace();
             Bukkit.getPluginManager().disablePlugin(this);
@@ -26,7 +37,12 @@ public class ViewDistanceTweaks extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
+        ViewDistanceUtils.syncSpigotViewDistances();
         new ViewDistanceLimiter(this);
+
+        getCommand("vdt").setExecutor(new VdtCommand(this));
+        getCommand("vdt").setPermission(VdtCommand.PERMISSON);
+        getCommand("vdt").setTabCompleter(VdtCommand.tabCompleter);
     }
 
     @Override

@@ -46,12 +46,12 @@ public class ViewDistanceLimiter {
                     int newViewDistance = (int) Math.min(viewDistanceTweaks.getViewDistanceTweaksConfig().getMaximumViewDistance(world),
                             Math.max(ViewDistanceUtils.viewDistanceFromChunkCount(weightedChunkShare), viewDistanceTweaks.getViewDistanceTweaksConfig().getMinimumViewDistance(world)));
                     boolean doChange = false;
-                    if (newViewDistance > world.getViewDistance()) {
+                    if (newViewDistance > ViewDistanceUtils.getViewDistance(world)) {
                         if (checkHistoryMap.get(world.getUID()).increase()
                                 >= viewDistanceTweaks.getViewDistanceTweaksConfig().getPassedChecksForIncrease()) {
                             doChange = true;
                         }
-                    } else if (newViewDistance < world.getViewDistance()) {
+                    } else if (newViewDistance < ViewDistanceUtils.getViewDistance(world)) {
                         if (checkHistoryMap.get(world.getUID()).decrease()
                                 >= viewDistanceTweaks.getViewDistanceTweaksConfig().getPassedChecksForDecrease()) {
                             doChange = true;
