@@ -3,6 +3,7 @@ package com.froobworld.viewdistancetweaks;
 import com.froobworld.viewdistancetweaks.command.VdtCommand;
 import com.froobworld.viewdistancetweaks.config.Config;
 import com.froobworld.viewdistancetweaks.limiter.ViewDistanceLimiter;
+import com.froobworld.viewdistancetweaks.metrics.Metrics;
 import com.froobworld.viewdistancetweaks.util.ViewDistanceUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -43,6 +44,8 @@ public class ViewDistanceTweaks extends JavaPlugin {
         getCommand("vdt").setExecutor(new VdtCommand(this));
         getCommand("vdt").setPermission(VdtCommand.PERMISSON);
         getCommand("vdt").setTabCompleter(VdtCommand.tabCompleter);
+
+        new Metrics(this, 6488);
     }
 
     @Override
