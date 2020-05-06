@@ -4,6 +4,9 @@ import com.froobworld.viewdistancetweaks.command.VdtCommand;
 import com.froobworld.viewdistancetweaks.config.Config;
 import com.froobworld.viewdistancetweaks.limiter.ViewDistanceLimiter;
 import com.froobworld.viewdistancetweaks.metrics.Metrics;
+import com.froobworld.viewdistancetweaks.util.PaperViewDistanceHook;
+import com.froobworld.viewdistancetweaks.util.SpigotViewDistanceHook;
+import com.froobworld.viewdistancetweaks.util.ViewDistanceHook;
 import com.froobworld.viewdistancetweaks.util.ViewDistanceUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,6 +15,7 @@ import java.io.IOException;
 
 public class ViewDistanceTweaks extends JavaPlugin {
     private Config config;
+    private ViewDistanceHook viewDistanceHook;
 
     @Override
     public void onEnable() {
@@ -38,6 +42,13 @@ public class ViewDistanceTweaks extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
+        if (PaperViewDistanceHook.isCompatible()) {
+            viewDistanceHook = new PaperViewDistanceHook();
+        } else {
+            viewDistanceHook = new SpigotViewDistanceHook();
+        }
+        getLogger().info("Using " + viewDistanceHook.getClass().getSimpleName() + " for the view distance hook.");
+
         ViewDistanceUtils.syncSpigotViewDistances();
         new ViewDistanceLimiter(this);
 
@@ -53,6 +64,10 @@ public class ViewDistanceTweaks extends JavaPlugin {
 
     public Config getViewDistanceTweaksConfig() {
         return config;
+    }
+
+    public ViewDistanceHook getViewDistanceHook() {
+        return viewDistanceHook;
     }
 
 }

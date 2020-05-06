@@ -1,5 +1,6 @@
 package com.froobworld.viewdistancetweaks.limiter;
 
+import com.froobworld.viewdistancetweaks.util.ViewDistanceHook;
 import com.froobworld.viewdistancetweaks.ViewDistanceTweaks;
 import com.froobworld.viewdistancetweaks.util.ViewDistanceUtils;
 import org.bukkit.Bukkit;
@@ -12,9 +13,11 @@ public class ViewDistanceLimiter {
 
     private ViewDistanceTweaks viewDistanceTweaks;
     private List<ChangeViewDistanceTask> runningChangeViewDistanceTasks = new ArrayList<>();
+    private ViewDistanceHook viewDistanceHook;
 
     public ViewDistanceLimiter(ViewDistanceTweaks viewDistanceTweaks) {
         this.viewDistanceTweaks = viewDistanceTweaks;
+        this.viewDistanceHook = viewDistanceTweaks.getViewDistanceHook();
         new CheckTask().run();
     }
 
@@ -46,12 +49,12 @@ public class ViewDistanceLimiter {
                     int newViewDistance = (int) Math.min(viewDistanceTweaks.getViewDistanceTweaksConfig().getMaximumViewDistance(world),
                             Math.max(ViewDistanceUtils.viewDistanceFromChunkCount(weightedChunkShare), viewDistanceTweaks.getViewDistanceTweaksConfig().getMinimumViewDistance(world)));
                     boolean doChange = false;
-                    if (newViewDistance > ViewDistanceUtils.getViewDistance(world)) {
+                    if (newViewDistance > viewDistanceHook.getViewDistance(world)) {
                         if (checkHistoryMap.get(world.getUID()).increase()
                                 >= viewDistanceTweaks.getViewDistanceTweaksConfig().getPassedChecksForIncrease()) {
                             doChange = true;
                         }
-                    } else if (newViewDistance < ViewDistanceUtils.getViewDistance(world)) {
+                    } else if (newViewDistance < viewDistanceHook.getViewDistance(world)) {
                         if (checkHistoryMap.get(world.getUID()).decrease()
                                 >= viewDistanceTweaks.getViewDistanceTweaksConfig().getPassedChecksForDecrease()) {
                             doChange = true;

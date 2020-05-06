@@ -23,7 +23,7 @@ public class StatusCommand implements CommandExecutor {
         sender.sendMessage(ChatColor.GRAY + "Format: view dist. / load. chunks / load. chunks (weighted)");
         for (World world : Bukkit.getWorlds()) {
             sender.sendMessage(ChatColor.YELLOW + world.getName());
-            int viewDistance = ViewDistanceUtils.getViewDistance(world);
+            int viewDistance = viewDistanceTweaks.getViewDistanceHook().getViewDistance(world);
             int chunksLoaded = world.getLoadedChunks().length;
             int weightedChunksLoaded = (int) (chunksLoaded * viewDistanceTweaks.getViewDistanceTweaksConfig().getChunkWeight(world));
             totalChunksLoaded += chunksLoaded;

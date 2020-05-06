@@ -1,5 +1,6 @@
 package com.froobworld.viewdistancetweaks.limiter;
 
+import com.froobworld.viewdistancetweaks.util.ViewDistanceHook;
 import com.froobworld.viewdistancetweaks.ViewDistanceTweaks;
 import com.froobworld.viewdistancetweaks.util.ViewDistanceUtils;
 import org.bukkit.Bukkit;
@@ -11,9 +12,11 @@ public class ChangeViewDistanceTask implements Runnable {
     private int targetViewDistance;
     private long period;
     private boolean completed;
+    private ViewDistanceHook viewDistanceHook;
 
     public ChangeViewDistanceTask(ViewDistanceTweaks viewDistanceTweaks, World world, int targetViewDistance, long period) {
         this.viewDistanceTweaks = viewDistanceTweaks;
+        this.viewDistanceHook = viewDistanceTweaks.getViewDistanceHook();
         this.world = world;
         this.targetViewDistance = ViewDistanceUtils.clampViewDistance(targetViewDistance);
         this.period = period;
@@ -21,20 +24,20 @@ public class ChangeViewDistanceTask implements Runnable {
 
     @Override
     public void run() {
-        int from = ViewDistanceUtils.getViewDistance(world);
+        int from = viewDistanceHook.getViewDistance(world);
         if (period <= 0) {
-            ViewDistanceUtils.setViewDistance(world, targetViewDistance);
+            viewDistanceHook.setViewDistance(world, targetViewDistance);
             completed = true;
         } else {
-            int diff = Integer.compare(targetViewDistance, ViewDistanceUtils.getViewDistance(world));
-            ViewDistanceUtils.setViewDistance(world, ViewDistanceUtils.getViewDistance(world) + diff);
-            if (ViewDistanceUtils.getViewDistance(world) == targetViewDistance) {
+            int diff = Integer.compare(targetViewDistance, viewDistanceHook.getViewDistance(world));
+            viewDistanceHook.setViewDistance(world, viewDistanceHook.getViewDistance(world) + diff);
+            if (viewDistanceHook.getViewDistance(world) == targetViewDistance) {
                 completed = true;
             } else {
                 Bukkit.getScheduler().scheduleSyncDelayedTask(viewDistanceTweaks, this, period);
             }
         }
-        int to = ViewDistanceUtils.getViewDistance(world);
+        int to = viewDistanceHook.getViewDistance(world);
         if (viewDistanceTweaks.getViewDistanceTweaksConfig().logViewDistanceChangs() && from != to) {
             viewDistanceTweaks.getLogger().info("View distance of " + world.getName() + " changed to " + to
                     + " (was " + from + ").");
