@@ -29,7 +29,7 @@ public class VdtConfig extends NabConfiguration {
     public final ConfigEntry<AdjustmentMode.Mode> adjustmentMode = ConfigEntries.enumEntry(AdjustmentMode.Mode.class);
 
     @Section(key = "proactive-mode-settings")
-    public ProactiveModeSettings proactiveMode = new ProactiveModeSettings();
+    public final ProactiveModeSettings proactiveMode = new ProactiveModeSettings();
 
     public static class ProactiveModeSettings extends ConfigSection {
 
@@ -39,7 +39,7 @@ public class VdtConfig extends NabConfiguration {
     }
 
     @Section(key = "reactive-mode-settings")
-    public ReactiveModeSettings reactiveMode = new ReactiveModeSettings();
+    public final ReactiveModeSettings reactiveMode = new ReactiveModeSettings();
 
     public static class ReactiveModeSettings extends ConfigSection {
 
@@ -53,7 +53,7 @@ public class VdtConfig extends NabConfiguration {
         public final TpsPredictionSettings tpsPrediction = new TpsPredictionSettings();
 
         @Section(key = "tps-tracker-settings")
-        public TpsTrackerSettings tpsTracker = new TpsTrackerSettings();
+        public final TpsTrackerSettings tpsTracker = new TpsTrackerSettings();
 
         public static class TpsTrackerSettings extends ConfigSection {
 
