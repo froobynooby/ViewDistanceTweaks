@@ -1,4 +1,4 @@
-package com.froobworld.viewdistancetweaks.util;
+package com.froobworld.viewdistancetweaks.hook.viewdistance;
 
 import org.bukkit.World;
 

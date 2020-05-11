@@ -1,0 +1,110 @@
+[header]
+header = # Configuration for View Distance Tweaks.\n# Plugin page: https://www.spigotmc.org/resources/75164/\n# Github: https://github.com/froobynooby/ViewDistanceTweaks
+
+[comment]
+key = smooth-change-period
+comment = # This setting is no longer used.
+
+[comment-out]
+key = smooth-change-period
+
+[add-field]
+before = ticks-per-check
+key = adjustment-mode
+value = proactive
+comment = # How should we determine whether the view distance needs adjusting? Accepts three values:\n#  * proactive : Adjust the view distance so that the player-loaded chunk count is always below a set threshold.\n#  * reactive  : Adjust the view distance in response to changes in the server's TPS.\n#  * mixed     : Be both proactive and reactive; prioritising decreasing the view distance over increasing.
+
+[add-section]
+before = ticks-per-check
+key = proactive-mode-settings
+comment = # These settings are for the proactive adjustment mode.
+
+[move]
+from = global-chunk-count-target
+to = proactive-mode-settings.global-chunk-count-target
+
+[add-section]
+before = ticks-per-check
+key = reactive-mode-settings
+comment = # These settings are for the reactive adjustment mode.
+
+[add-field]
+key = reactive-mode-settings.increase-tps-threshold
+value = 19.9
+comment = # Above what TPS should we consider increasing the view distance?
+
+[add-field]
+key = reactive-mode-settings.decrease-tps-threshold
+value = 18.0
+comment = # Below what TPS should we consider decreasing the view distance?
+
+[add-section]
+key = reactive-mode-settings.tps-tracker-settings
+comment = # These settings concern how we determine the TPS.\n#  * Only touch these settings if you know what you're doing.
+
+[add-field]
+key = reactive-mode-settings.tps-tracker-settings.collection-period
+value = 1200
+comment = # Over how many ticks should we collect tick durations for calculating the TPS?\n#  * Setting this too high will make the TPS very slow to react to changes.\n#  * Setting this too low will make the TPS volatile.
+
+[add-field]
+key = reactive-mode-settings.tps-tracker-settings.trim-outliers-to-within
+value = 100
+comment = # By how much (in percent) should we allow the tick durations we use to calculate the TPS vary from the average\n# tick duration.\n#  * This is used for smoothing the TPS; making sure it's not heavily affected by sudden large lag spikes, such as\n#    those caused by garbage collections or world-saves.\n#  * Setting this to 0 will mean your TPS will never change - don't do that.
+
+[add-section]
+key = reactive-mode-settings.tps-prediction
+comment =  # We keep a history of TPS vs. player-loaded chunk count in order to better predict what the TPS will settle to after\n# increasing the view distance.
+
+[add-field]
+key = reactive-mode-settings.tps-prediction.enabled
+value = true
+comment = # Should we use TPS prediction when we are considering increasing the view distance?\n#  * For example, we may be at 20 TPS with a view distance of 6, meaning we would consider increasing the view\n#    distance to 7. However, if we saw that 10 minutes ago with a view distance of 7 we had 17 TPS, we would hold\n#    off on increasing.\n#  * Disabling this can lead to a back-and-forth game of increasing and decreasing the view distance every few\n#    minutes - not ideal.
+
+[add-field]
+key = reactive-mode-settings.tps-prediction.history-length
+value = 20
+comment = # For how long (in minutes) should we keep a TPS / chunk count history?
+
+[add-section]
+key = world-settings.default.chunk-counter-settings
+comment = # These settings concern how we count the number of chunks in this world.
+
+[add-field]
+key = world-settings.default.chunk-counter-settings.exclude-overlap
+value = false
+comment = # When two players are near each other, their view distances can overlap. Should we not double count the chunks\n# that are overlapping?
+
+[add-section]
+key = paper-settings
+comment = # These are additional settings that apply if you are using Paper as your server software.
+
+[add-section]
+key = paper-settings.no-tick-view-distance
+comment = # These settings concern the no-tick view distance available in Paper 1.15.2+.\n#  * Note: higher no-tick view distances are less heavy on the server as far as TPS goes. For this reason, there is no\n#    option to adjust no-tick view distance based on TPS.
+
+[add-field]
+key = paper-settings.no-tick-view-distance.enabled
+value = false
+comment = # Should we adjust the no-tick view distance?
+
+[add-field]
+key = paper-settings.no-tick-view-distance.global-chunk-count-target
+value = 6720
+comment = # Set this to the maximum number of chunks you want to be loaded by the no-tick view distance.\n#  * Note: this only counts chunks that are outside of the standard view distance of a player, but within the\n#    no-tick view distance of a player.\n#  * If you know your server can handle up to p many players with a no-tick view distance of n and a standard view\n#    distance of d, a reasonable choice is to set this to ((2n + 1)^2 - (2d + 1)^2) * p.\n#  * As an example, 6720 is the number of chunks loaded by the no-tick view distance for 20 players with a no-tick\n#    view distance of 12, and a standard view distance of 8.
+
+[add-section]
+key = paper-settings.world-settings
+
+[add-section]
+key = paper-settings.world-settings.default
+
+[add-field]
+key = paper-settings.world-settings.default.minimum-no-tick-view-distance
+value = 8
+comment = # What should the absolute minimum no-tick view distance be in this world?
+
+[add-field]
+key = paper-settings.world-settings.default.maximum-no-tick-view-distance
+value = 16
+comment = # What should the absolute maximum no-tick view distance be in this world?

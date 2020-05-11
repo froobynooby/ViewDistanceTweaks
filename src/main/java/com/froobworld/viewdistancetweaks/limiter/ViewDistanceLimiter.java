@@ -1,99 +1,74 @@
 package com.froobworld.viewdistancetweaks.limiter;
 
-import com.froobworld.viewdistancetweaks.util.ViewDistanceHook;
 import com.froobworld.viewdistancetweaks.ViewDistanceTweaks;
-import com.froobworld.viewdistancetweaks.util.ViewDistanceUtils;
+import com.froobworld.viewdistancetweaks.hook.viewdistance.ViewDistanceHook;
+import com.froobworld.viewdistancetweaks.limiter.adjustmentmode.AdjustmentMode;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
+import java.text.MessageFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class ViewDistanceLimiter {
-    private Map<UUID, ViewDistanceCheckResultHistory> checkHistoryMap = new HashMap<>();
+public class ViewDistanceLimiter implements Runnable {
+    private final ViewDistanceTweaks viewDistanceTweaks;
+    private final ViewDistanceHook viewDistanceHook;
+    private final AdjustmentMode adjustmentMode;
+    private final Set<ViewDistanceChangeTask> changeViewDistanceTasks = new HashSet<>();
+    private final boolean logChanges;
+    private final String logFormat;
+    private Integer taskId;
 
-    private ViewDistanceTweaks viewDistanceTweaks;
-    private List<ChangeViewDistanceTask> runningChangeViewDistanceTasks = new ArrayList<>();
-    private ViewDistanceHook viewDistanceHook;
-
-    public ViewDistanceLimiter(ViewDistanceTweaks viewDistanceTweaks) {
+    public ViewDistanceLimiter(ViewDistanceTweaks viewDistanceTweaks, ViewDistanceHook viewDistanceHook, AdjustmentMode adjustmentMode, boolean logChanges, String logFormat) {
         this.viewDistanceTweaks = viewDistanceTweaks;
-        this.viewDistanceHook = viewDistanceTweaks.getViewDistanceHook();
-        new CheckTask().run();
+        this.viewDistanceHook = viewDistanceHook;
+        this.adjustmentMode = adjustmentMode;
+        this.logChanges = logChanges;
+        this.logFormat = logFormat;
     }
 
-    private boolean changeViewDistanceTasksRunning() {
-        for (ChangeViewDistanceTask task : runningChangeViewDistanceTasks) {
-            if (!task.completed()) {
-                return true;
-            }
-        }
-        runningChangeViewDistanceTasks.clear();
-        return false;
-    }
 
-    public class CheckTask implements Runnable {
+    @Override
+    public void run() {
+        if (changeViewDistanceTasks.isEmpty()) {
+            List<World> nonEmptyWorlds = Bukkit.getWorlds().stream()
+                    .filter(world -> !world.getPlayers().isEmpty())
+                    .collect(Collectors.toList());
+            Map<World, AdjustmentMode.Adjustment> adjustments = adjustmentMode.getAdjustments(nonEmptyWorlds);
 
-        @Override
-        public void run() {
-            if (Bukkit.getOnlinePlayers().size() > 0 && !changeViewDistanceTasksRunning()) {
-                double weightedPlayerCount = 0;
-                for (World world : Bukkit.getWorlds()) {
-                    double chunkWeight = viewDistanceTweaks.getViewDistanceTweaksConfig().getChunkWeight(world);
-                    weightedPlayerCount += world.getPlayers().size() * chunkWeight;
-                }
-                double chunkShare = weightedPlayerCount == 0 ? Integer.MAX_VALUE : viewDistanceTweaks.getViewDistanceTweaksConfig().getTargetGlobalChunkCount() / weightedPlayerCount;
-                for (World world : Bukkit.getWorlds()) {
-                    checkHistoryMap.putIfAbsent(world.getUID(), new ViewDistanceCheckResultHistory());
-                    double chunkWeight = viewDistanceTweaks.getViewDistanceTweaksConfig().getChunkWeight(world);
-                    double weightedChunkShare = chunkWeight == 0 ? Integer.MAX_VALUE : chunkShare / chunkWeight;
-                    int newViewDistance = (int) Math.min(viewDistanceTweaks.getViewDistanceTweaksConfig().getMaximumViewDistance(world),
-                            Math.max(ViewDistanceUtils.viewDistanceFromChunkCount(weightedChunkShare), viewDistanceTweaks.getViewDistanceTweaksConfig().getMinimumViewDistance(world)));
-                    boolean doChange = false;
-                    if (newViewDistance > viewDistanceHook.getViewDistance(world)) {
-                        if (checkHistoryMap.get(world.getUID()).increase()
-                                >= viewDistanceTweaks.getViewDistanceTweaksConfig().getPassedChecksForIncrease()) {
-                            doChange = true;
-                        }
-                    } else if (newViewDistance < viewDistanceHook.getViewDistance(world)) {
-                        if (checkHistoryMap.get(world.getUID()).decrease()
-                                >= viewDistanceTweaks.getViewDistanceTweaksConfig().getPassedChecksForDecrease()) {
-                            doChange = true;
-                        }
-                    }
+            for (Map.Entry<World, AdjustmentMode.Adjustment> entry : adjustments.entrySet()) {
+                World world = entry.getKey();
+                AdjustmentMode.Adjustment adjustment = entry.getValue();
+                int oldViewDistance = viewDistanceHook.getViewDistance(world);
 
-                    if (doChange) {
-                        checkHistoryMap.put(world.getUID(), new ViewDistanceCheckResultHistory());
-                        ChangeViewDistanceTask changeTask = new ChangeViewDistanceTask(viewDistanceTweaks, world,
-                                newViewDistance, viewDistanceTweaks.getViewDistanceTweaksConfig().getSmoothChangePeriod());
-                        changeTask.run();
-                        runningChangeViewDistanceTasks.add(changeTask);
+                if (adjustment != AdjustmentMode.Adjustment.STAY) {
+                    int newViewDistance = oldViewDistance + (adjustment == AdjustmentMode.Adjustment.INCREASE ? 1 : -1);
+                    ViewDistanceChangeTask changeTask = new ViewDistanceChangeTask(viewDistanceTweaks, viewDistanceHook, world, newViewDistance, 0);
+                    changeTask.run();
+                    changeViewDistanceTasks.add(changeTask);
+                    if (logChanges) {
+                        viewDistanceTweaks.getLogger().info(MessageFormat.format(logFormat, world.getName(), oldViewDistance, newViewDistance));
                     }
                 }
-
-
             }
-            Bukkit.getScheduler().scheduleSyncDelayedTask(viewDistanceTweaks, this,
-                    Math.max(1, viewDistanceTweaks.getViewDistanceTweaksConfig().getTicksPerCheck()));
         }
-
+        changeViewDistanceTasks.removeIf(ViewDistanceChangeTask::completed);
     }
 
-    private static class ViewDistanceCheckResultHistory {
-        private int increaseCount;
-        private int decreaseCount;
-
-        public int increase() {
-            decreaseCount = 0;
-            increaseCount++;
-            return increaseCount;
+    public void start(long period) {
+        if (taskId != null) {
+            throw new IllegalStateException("Already started.");
         }
+        taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(viewDistanceTweaks, this, period, period);
+    }
 
-        public int decrease() {
-            increaseCount = 0;
-            decreaseCount++;
-            return decreaseCount;
+    public void cancel() {
+        if (taskId != null) {
+            Bukkit.getScheduler().cancelTask(taskId);
+            changeViewDistanceTasks.forEach(ViewDistanceChangeTask::cancel);
+            changeViewDistanceTasks.clear();
+            taskId = null;
         }
-
     }
 
 }

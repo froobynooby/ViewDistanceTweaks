@@ -18,13 +18,13 @@ public class ReloadCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         try {
-            viewDistanceTweaks.getViewDistanceTweaksConfig().load();
-            sender.sendMessage(ChatColor.YELLOW + "Configuration reloaded.");
-        } catch (IOException e) {
-            sender.sendMessage(ChatColor.RED + "Something went wrong reloading the config, see the console for more.");
+            viewDistanceTweaks.reload();
+            sender.sendMessage(ChatColor.YELLOW + "Plugin reloaded.");
+        } catch (Exception e) {
+            sender.sendMessage(ChatColor.RED + "Something went wrong reloading the plugin, see the console for more.");
             e.printStackTrace();
         }
-        return false;
+        return true;
     }
 
 }

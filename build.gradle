@@ -4,12 +4,13 @@ plugins {
 }
 
 group 'com.froobworld'
-version '1.0.1'
+version '1.1.0'
 jar.enabled = false;
 
 sourceCompatibility = 1.8
 
 repositories {
+    mavenLocal();
     mavenCentral()
     maven {
         url "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
@@ -17,12 +18,16 @@ repositories {
     maven {
         url "https://oss.sonatype.org/content/groups/public/"
     }
+    maven {
+        url "https://papermc.io/repo/repository/maven-public/"
+    }
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compileOnly 'org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT'
+    compileOnly 'com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT'
     compile 'org.jooq:joor-java-8:0.9.7'
+    compile 'com.froobworld:nab-configuration:1.0.0'
 }
 
 processResources {
@@ -31,6 +36,9 @@ processResources {
 
 shadowJar {
     archiveFileName = 'ViewDistanceTweaks-' + project.version.toString() + '.jar';
+
+    relocate 'com.froobworld.nabconfiguration', 'com.froobworld.viewdistancetweaks.lib.nabconfiguration'
+    relocate 'org.joor', 'com.froobworld.viewdistancetweaks.lib.joor'
 }
 
 artifacts {

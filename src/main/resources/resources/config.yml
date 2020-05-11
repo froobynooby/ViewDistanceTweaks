@@ -1,17 +1,65 @@
+# Configuration for View Distance Tweaks.
+# Plugin page: https://www.spigotmc.org/resources/75164/
+# Github: https://github.com/froobynooby/ViewDistanceTweaks
+
 # Please don't change this!
-version: 1
+version: 2
 
 # Set this to true to enable the plugin. The plugin is initially disabled so that you can make changes to the config
 # appropriate to your server.
 enabled: false
 
+# How should we determine whether the view distance needs adjusting? Accepts three values:
+#  * proactive : Adjust the view distance so that the player-loaded chunk count is always below a set threshold.
+#  * reactive  : Adjust the view distance in response to changes in the server's TPS.
+#  * mixed     : Be both proactive and reactive; prioritising decreasing the view distance over increasing.
+adjustment-mode: mixed
 
-# Set this to the maximum chunk count your server can handle. The view distance of each world will be adjusted such that
-# the total number of player-loaded chunks is sitting as close to this value as possible.
-#  * If you know your server can handle up to p many players with a view distance of d, a reasonable choice is to set
-#    this to (2d + 1)^2 * p.
-#  * As an example, 5780 is the number of player-loaded chunks for 20 players with a view distance of 8.
-global-chunk-count-target: 5780
+# These settings are for the proactive adjustment mode.
+proactive-mode-settings:
+  # Set this to the maximum chunk count your server can handle. The view distance of each world will be adjusted such
+  # that the total number of player-loaded chunks is sitting as close to this value as possible.
+  #  * If you know your server can handle up to p many players with a view distance of d, a reasonable choice is to set
+  #    this to (2d + 1)^2 * p.
+  #  * As an example, 5780 is the number of player-loaded chunks for 20 players with a view distance of 8.
+  global-chunk-count-target: 5780
+
+# These settings are for the reactive adjustment mode.
+reactive-mode-settings:
+  # Above what TPS should we consider increasing the view distance?
+  increase-tps-threshold: 19.9
+
+  # Below what TPS should we consider decreasing the view distance?
+  decrease-tps-threshold: 18.0
+
+  # These settings concern how we determine the TPS.
+  #  * Only touch these settings if you know what you're doing.
+  tps-tracker-settings:
+    # Over how many ticks should we collect tick durations for calculating the TPS?
+    #  * Setting this too high will make the TPS very slow to react to changes.
+    #  * Setting this too low will make the TPS volatile.
+    collection-period: 1200
+
+    # By how much (in percent) should we allow the tick durations we use to calculate the TPS vary from the average
+    # tick duration.
+    #  * This is used for smoothing the TPS; making sure it's not heavily affected by sudden large lag spikes, such as
+    #    those caused by garbage collections or world-saves.
+    #  * Setting this to 0 will mean your TPS will never change - don't do that.
+    trim-outliers-to-within: 100.0
+
+  # We keep a history of TPS vs. player-loaded chunk count in order to better predict what the TPS will settle to after
+  # increasing the view distance.
+  tps-prediction:
+    # Should we use TPS prediction when we are considering increasing the view distance?
+    #  * For example, we may be at 20 TPS with a view distance of 6, meaning we would consider increasing the view
+    #    distance to 7. However, if we saw that 10 minutes ago with a view distance of 7 we had 17 TPS, we would hold
+    #    off on increasing.
+    #  * Disabling this can lead to a back-and-forth game of increasing and decreasing the view distance every few
+    #    minutes - not ideal.
+    enabled: true
+
+    # For how long (in minutes) should we keep a TPS / chunk count history?
+    history-length: 30
 
 # Every how many ticks should we check whether the view distance needs to be updated?
 ticks-per-check: 600
@@ -28,16 +76,8 @@ passed-checks-for-increase: 10
 # actually decreased?
 passed-checks-for-decrease: 1
 
-# In order to be less jarring, the view distance is periodically incremented or decremented by 1 until it reaches
-# its target value. Every how many ticks should we increment or decrement the view distance?
-#  * Setting to 0 will cause the view distance to immediately change to its target value, even if this means jumping
-#    from 4 to 32.
-#  * Having this set relatively high will also reduce lag-spikes that players with poorer connections will experience
-#    when the view distance is increased.
-smooth-change-period: 300
-
 # Should we send a message to the console when we change the view distance?
-log-view-distance-changes: true
+log-view-distance-changes: false
 
 # These settings can be specified per world. If a world is not specified or if a setting is missing, it will use the
 # settings listed under the default section.
@@ -47,18 +87,47 @@ world-settings:
     minimum-view-distance: 6
 
     # What should the absolute maximum view distance be in this world?
-    maximum-view-distance: 16
+    maximum-view-distance: 12
 
     # Relative to the other worlds, how 'heavy' is a chunk on performance?
     #  * For example: In the End dimension, about half of the chunks you encounter are void and so have very little
     #    impact on performance. For this reason, you may want to set the chunk-weight of the End to 0.5.
     chunk-weight: 1
 
-#  world_nether:
-#    minimum-view-distance: 6
-#    maximum-view-distance: 10
+    # These settings concern how we count the number of chunks in this world.
+    chunk-counter-settings:
+
+      # When two players are near each other, their view distances can overlap. Should we not double count the chunks
+      # that are overlapping?
+      exclude-overlap: true
 
 #  world_the_end:
-#    minimum-view-distance: 6
+#    minimum-view-distance: 8
 #    maximum-view-distance: 10
 #    chunk-weight: 0.5
+
+# These are additional settings that apply if you are using Paper as your server software.
+paper-settings:
+  # These settings concern the no-tick view distance available in Paper 1.15.2+.
+  #  * Note: higher no-tick view distances are less heavy on the server as far as TPS goes. For this reason, there is no
+  #    option to adjust no-tick view distance based on TPS.
+  no-tick-view-distance:
+    # Should we adjust the no-tick view distance?
+    enabled: true
+
+    # Set this to the maximum number of chunks you want to be loaded by the no-tick view distance.
+    #  * Note: this only counts chunks that are outside of the standard view distance of a player, but within the
+    #    no-tick view distance of a player.
+    #  * If you know your server can handle up to p many players with a no-tick view distance of n and a standard view
+    #    distance of d, a reasonable choice is to set this to ((2n + 1)^2 - (2d + 1)^2) * p.
+    #  * As an example, 6720 is the number of chunks loaded by the no-tick view distance for 20 players with a no-tick
+    #    view distance of 12, and a standard view distance of 8.
+    global-chunk-count-target: 6720
+
+  world-settings:
+    default:
+      # What should the absolute minimum no-tick view distance be in this world?
+      minimum-no-tick-view-distance: 8
+
+      # What should the absolute maximum no-tick view distance be in this world?
+      maximum-no-tick-view-distance: 16

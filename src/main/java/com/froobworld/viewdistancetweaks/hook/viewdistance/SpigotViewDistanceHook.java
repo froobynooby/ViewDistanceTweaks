@@ -1,7 +1,10 @@
-package com.froobworld.viewdistancetweaks.util;
+package com.froobworld.viewdistancetweaks.hook.viewdistance;
 
+import com.froobworld.viewdistancetweaks.util.NmsUtils;
+import com.froobworld.viewdistancetweaks.util.ViewDistanceUtils;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.joor.Reflect;
 
 import static org.joor.Reflect.*;
 
@@ -25,7 +28,7 @@ public class SpigotViewDistanceHook implements ViewDistanceHook {
     }
 
     private static void sendUpdatedViewDistance(World world, int viewDistance) {
-        Object packet = on(NmsUtils.getFullyQualifiedClassName("PacketPlayOutViewDistance")).create(viewDistance).get();
+        Object packet = Reflect.on(NmsUtils.getFullyQualifiedClassName("PacketPlayOutViewDistance")).create(viewDistance).get();
 
         for (Player player : world.getPlayers()) {
             on(player).call("getHandle")
