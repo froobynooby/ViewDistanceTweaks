@@ -1,6 +1,8 @@
 package com.froobworld.viewdistancetweaks.command;
 
 import com.froobworld.viewdistancetweaks.ViewDistanceTweaks;
+import com.froobworld.viewdistancetweaks.hook.viewdistance.ViewDistanceHook;
+import com.froobworld.viewdistancetweaks.util.ChunkCounter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -19,22 +21,27 @@ public class StatusCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        ViewDistanceHook viewDistanceHook = viewDistanceTweaks.getHookManager().getViewDistanceHook();
+        ViewDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook();
+        ChunkCounter chunkCounter = viewDistanceTweaks.getHookManager().getChunkCounter();
+        ChunkCounter noTickChunkCounter = viewDistanceTweaks.getHookManager().getNoTickChunkCounter();
+
         String statusMessage = ChatColor.RED + "{0} " + ChatColor.GRAY + "/" + ChatColor.RED + " {1}";
         String noTickStatusMessage = ChatColor.RED + "{0} " + ChatColor.GRAY + "/" + ChatColor.RED + " {1} " + ChatColor.GRAY + "/" + ChatColor.RED + " {2} " + ChatColor.GRAY + "/" + ChatColor.RED + " {3}";
-        String format = viewDistanceTweaks.getNoTickViewDistanceHook() == null ? statusMessage : noTickStatusMessage;
+        String format = noTickViewDistanceHook == null ? statusMessage : noTickStatusMessage;
 
         int totalChunks = 0;
         int totalNoTickChunks = 0;
         sender.sendMessage(ChatColor.GRAY + "Format: " + MessageFormat.format(format, "view d.", "chunks", "no-tick view d.", "no-tick chunks"));
         for (World world : Bukkit.getWorlds()) {
-            int viewDistance = viewDistanceTweaks.getViewDistanceHook().getViewDistance(world);
-            int loadedChunks = (int) viewDistanceTweaks.getChunkCounter().countChunks(world, viewDistance);
+            int viewDistance = viewDistanceHook.getViewDistance(world);
+            int loadedChunks = (int) chunkCounter.countChunks(world, viewDistance);
             int noTickViewDistance = 0;
             int loadedNoTickChunks = 0;
             totalChunks += loadedChunks;
-            if (viewDistanceTweaks.getNoTickViewDistanceHook() != null) {
-                noTickViewDistance = viewDistanceTweaks.getNoTickViewDistanceHook().getViewDistance(world);
-                loadedNoTickChunks = (int) viewDistanceTweaks.getNoTickChunkCounter().countChunks(world, noTickViewDistance);
+            if (noTickViewDistanceHook != null) {
+                noTickViewDistance = noTickViewDistanceHook.getViewDistance(world);
+                loadedNoTickChunks = (int) noTickChunkCounter.countChunks(world, noTickViewDistance);
                 totalNoTickChunks += loadedNoTickChunks;
             }
 
