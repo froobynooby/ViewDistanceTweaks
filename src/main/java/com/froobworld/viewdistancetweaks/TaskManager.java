@@ -1,12 +1,14 @@
 package com.froobworld.viewdistancetweaks;
 
 import com.froobworld.viewdistancetweaks.hook.viewdistance.ViewDistanceHook;
+import com.froobworld.viewdistancetweaks.limiter.StartupClampTask;
 import com.froobworld.viewdistancetweaks.limiter.ViewDistanceLimiter;
 import com.froobworld.viewdistancetweaks.limiter.adjustmentmode.AdjustmentMode;
 import com.froobworld.viewdistancetweaks.limiter.adjustmentmode.MixedAdjustmentMode;
 import com.froobworld.viewdistancetweaks.limiter.adjustmentmode.ProactiveAdjustmentMode;
 import com.froobworld.viewdistancetweaks.limiter.adjustmentmode.ReactiveAdjustmentMode;
 import com.froobworld.viewdistancetweaks.util.TpsTracker;
+import org.bukkit.Bukkit;
 
 public class TaskManager {
     private ViewDistanceTweaks viewDistanceTweaks;
@@ -23,6 +25,7 @@ public class TaskManager {
         initTpsTracker();
         initLimiterTask();
         initNoTickLimiterTask();
+        clampViewDistances();
     }
 
     public void reload() {
@@ -105,6 +108,23 @@ public class TaskManager {
                     "Changed no-tick view distance of {0} ({1} -> {2})"
             );
             noTickLimiterTask.start(viewDistanceTweaks.getVdtConfig().ticksPerCheck.get());
+        }
+    }
+
+    public void clampViewDistances() {
+        new StartupClampTask(
+                viewDistanceTweaks.getHookManager().getViewDistanceHook(),
+                world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).maximumViewDistance.get(),
+                world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).minimumViewDistance.get()
+        ).runOnWorlds(Bukkit.getWorlds());
+
+        ViewDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook();
+        if (noTickViewDistanceHook != null) {
+            new StartupClampTask(
+                    noTickViewDistanceHook,
+                    world -> viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).maximumNoTickViewDistance.get(),
+                    world -> viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).minimumNoTickViewDistance.get()
+            ).runOnWorlds(Bukkit.getWorlds());
         }
     }
 
