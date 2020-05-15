@@ -7,7 +7,7 @@ import java.util.List;
  * This is a tool for finding the total area of a set of integer rectangles where intersections are not double counted.
  */
 public class RectangleUnionAreaFinder {
-    private final List<Rect> disjointRectSet = new ArrayList<>();
+    private final List<Rect> rectSet = new ArrayList<>();
     private int area = 0;
 
     public RectangleUnionAreaFinder addRect(int x0, int y0, int x1, int y1) {
@@ -15,19 +15,14 @@ public class RectangleUnionAreaFinder {
         List<Rect> newRects = new ArrayList<>();
         List<Rect> newNewRects = new ArrayList<>();
         newRects.add(addingRect);
-        for (Rect rect : disjointRectSet) {
+        for (Rect rect : rectSet) {
             if (addingRect.xMax <= rect.xMin || addingRect.xMin >= rect.xMax
                     ||  addingRect.yMax <= rect.yMin || addingRect.yMin >= rect.yMax) {
                 continue;
             }
             newNewRects.clear();
             for (Rect newRect : newRects) {
-                Rect[] rects = newRect.getRectDifference(rect);
-                for (Rect value : rects) {
-                    if (value != null) {
-                        newNewRects.add(value);
-                    }
-                }
+                newRect.getRectDifference(rect, newNewRects);
             }
             List<Rect> oldNewRects = newRects;
             newRects = newNewRects;
@@ -37,7 +32,7 @@ public class RectangleUnionAreaFinder {
         for (Rect rect : newRects) {
             area += rect.area();
         }
-        disjointRectSet.addAll(newRects);
+        rectSet.add(addingRect);
         return this;
     }
 
@@ -61,11 +56,12 @@ public class RectangleUnionAreaFinder {
         }
 
         // Returns up to four disjoint rectangles that are disjoint from otherRect, and whose union is the difference of this and otherRect
-        public Rect[] getRectDifference(Rect otherRect) {
+        public List<Rect> getRectDifference(Rect otherRect, List<Rect> list) {
             // Case: not overlapping
             if (this.xMax <= otherRect.xMin || this.xMin >= otherRect.xMax
                     ||  this.yMax <= otherRect.yMin || this.yMin >= otherRect.yMax) {
-                return new Rect[]{this};
+                list.add(this);
+                return list;
             }
             Rect[] rects = new Rect[4];
 
@@ -76,7 +72,7 @@ public class RectangleUnionAreaFinder {
                 int yMin = this.yMin;
                 int yMax = this.yMax;
                 if (xMin < xMax && yMin < yMax) {
-                    rects[0] = new Rect(xMin, yMin, xMax, yMax);
+                    list.add(new Rect(xMin, yMin, xMax, yMax));
                 }
             }
             // Rect 1 : top
@@ -86,7 +82,7 @@ public class RectangleUnionAreaFinder {
                 int yMin = otherRect.yMax;
                 int yMax = this.yMax;
                 if (xMin < xMax && yMin < yMax) {
-                    rects[1] = new Rect(xMin, yMin, xMax, yMax);
+                    list.add(new Rect(xMin, yMin, xMax, yMax));
                 }
             }
             // Rect 2 : right side
@@ -96,7 +92,7 @@ public class RectangleUnionAreaFinder {
                 int yMin = this.yMin;
                 int yMax = this.yMax;
                 if (xMin < xMax && yMin < yMax) {
-                    rects[2] = new Rect(xMin, yMin, xMax, yMax);
+                    list.add(new Rect(xMin, yMin, xMax, yMax));
                 }
             }
             // Rect 3 : bottom
@@ -106,10 +102,10 @@ public class RectangleUnionAreaFinder {
                 int yMin = this.yMin;
                 int yMax = otherRect.yMin;
                 if (xMin < xMax && yMin < yMax) {
-                    rects[3] = new Rect(xMin, yMin, xMax, yMax);
+                    list.add(new Rect(xMin, yMin, xMax, yMax));
                 }
             }
-            return rects;
+            return list;
         }
 
     }
