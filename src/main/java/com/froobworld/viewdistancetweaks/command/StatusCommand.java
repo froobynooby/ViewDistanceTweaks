@@ -29,6 +29,9 @@ public class StatusCommand implements CommandExecutor {
         String statusMessage = ChatColor.RED + "{0} " + ChatColor.GRAY + "/" + ChatColor.RED + " {1}";
         String noTickStatusMessage = ChatColor.RED + "{0} " + ChatColor.GRAY + "/" + ChatColor.RED + " {1} " + ChatColor.GRAY + "/" + ChatColor.RED + " {2} " + ChatColor.GRAY + "/" + ChatColor.RED + " {3}";
         String format = noTickViewDistanceHook == null ? statusMessage : noTickStatusMessage;
+        String globalStatusMessage = ChatColor.GRAY + "Loaded chunks: " + ChatColor.RED + "{0}";
+        String noTickGlobalStatusMessage = ChatColor.GRAY + "Loaded chunks: " + ChatColor.RED + "{0}" + ChatColor.GRAY + " (" + ChatColor.RED + "{1}" + ChatColor.GRAY + " ticking, " + ChatColor.RED + "{2}" + ChatColor.GRAY + " non-ticking)";
+        String globalStatusFormat = noTickViewDistanceHook == null ? globalStatusMessage : noTickGlobalStatusMessage;
 
         int totalChunks = 0;
         int totalNoTickChunks = 0;
@@ -50,8 +53,7 @@ public class StatusCommand implements CommandExecutor {
         }
         sender.sendMessage("");
         sender.sendMessage(ChatColor.GOLD + "Global");
-        sender.sendMessage(ChatColor.GRAY + "Loaded chunks: " + ChatColor.RED + (totalChunks + totalNoTickChunks)
-                + ChatColor.GRAY + " (" + ChatColor.RED + totalChunks + ChatColor.GRAY + " ticking, " + ChatColor.RED + totalNoTickChunks + ChatColor.GRAY + " non-ticking" + ")");
+        sender.sendMessage(MessageFormat.format(globalStatusFormat, totalChunks + totalNoTickChunks, totalChunks, totalNoTickChunks));
 
         return true;
     }
