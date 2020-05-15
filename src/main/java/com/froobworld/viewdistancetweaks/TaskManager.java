@@ -121,7 +121,7 @@ public class TaskManager {
         ).runOnWorlds(Bukkit.getWorlds());
 
         ViewDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook();
-        if (noTickViewDistanceHook != null) {
+        if (noTickViewDistanceHook != null && viewDistanceTweaks.getVdtConfig().paperSettings.noTickViewDistance.enabled.get()) {
             new StartupClampTask(
                     noTickViewDistanceHook,
                     world -> viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).maximumNoTickViewDistance.get(),
