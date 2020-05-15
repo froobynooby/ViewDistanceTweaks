@@ -29,12 +29,13 @@ public class StatusCommand implements CommandExecutor {
         String statusMessage = ChatColor.RED + "{0} " + ChatColor.GRAY + "/" + ChatColor.RED + " {1}";
         String noTickStatusMessage = ChatColor.RED + "{0} " + ChatColor.GRAY + "/" + ChatColor.RED + " {1} " + ChatColor.GRAY + "/" + ChatColor.RED + " {2} " + ChatColor.GRAY + "/" + ChatColor.RED + " {3}";
         String format = noTickViewDistanceHook == null ? statusMessage : noTickStatusMessage;
-        String globalStatusMessage = ChatColor.GRAY + "Loaded chunks: " + ChatColor.RED + "{0}";
-        String noTickGlobalStatusMessage = ChatColor.GRAY + "Loaded chunks: " + ChatColor.RED + "{0}" + ChatColor.GRAY + " (" + ChatColor.RED + "{1}" + ChatColor.GRAY + " ticking, " + ChatColor.RED + "{2}" + ChatColor.GRAY + " non-ticking)";
+        String globalStatusMessage = ChatColor.GRAY + "Total chunks: " + ChatColor.RED + "{0}";
+        String noTickGlobalStatusMessage = ChatColor.GRAY + "Total chunks: " + ChatColor.RED + "{0}" + ChatColor.GRAY + " (" + ChatColor.RED + "{1}" + ChatColor.GRAY + " ticking, " + ChatColor.RED + "{2}" + ChatColor.GRAY + " non-ticking)";
         String globalStatusFormat = noTickViewDistanceHook == null ? globalStatusMessage : noTickGlobalStatusMessage;
 
         int totalChunks = 0;
         int totalNoTickChunks = 0;
+        sender.sendMessage(ChatColor.GRAY + "Note: " + ChatColor.GREEN + "The chunk counts below are only heuristic.");
         sender.sendMessage(ChatColor.GRAY + "Format: " + MessageFormat.format(format, "view d.", "chunks", "no-tick view d.", "no-tick chunks"));
         for (World world : Bukkit.getWorlds()) {
             int viewDistance = viewDistanceHook.getViewDistance(world);
@@ -51,8 +52,7 @@ public class StatusCommand implements CommandExecutor {
             sender.sendMessage(ChatColor.GOLD + world.getName());
             sender.sendMessage(MessageFormat.format(format, Integer.toString(viewDistance), Integer.toString(loadedChunks), Integer.toString(noTickViewDistance), Integer.toString(loadedNoTickChunks)));
         }
-        sender.sendMessage("");
-        sender.sendMessage(ChatColor.GOLD + "Global");
+        sender.sendMessage(ChatColor.GRAY + "--------");
         sender.sendMessage(MessageFormat.format(globalStatusFormat, totalChunks + totalNoTickChunks, totalChunks, totalNoTickChunks));
 
         return true;
