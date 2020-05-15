@@ -2,21 +2,20 @@ package com.froobworld.viewdistancetweaks.util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-public class PreferenceChooser<T> {
+public class PreferenceChooser {
     private final Map<Supplier<?>, BooleanSupplier> choiceConditionMap = new LinkedHashMap<>();
 
     private PreferenceChooser() {}
 
 
-    public static <T> PreferenceChooser<T> bestChoice(T choice, BooleanSupplier condition) {
+    public static <T> PreferenceChooser bestChoice(Object choice, BooleanSupplier condition) {
         return bestChoice(() -> choice, condition);
     }
 
-    public static <T> PreferenceChooser<T> bestChoice(Supplier<T> choice, BooleanSupplier condition) {
+    public static PreferenceChooser bestChoice(Supplier<?> choice, BooleanSupplier condition) {
         return new PreferenceChooser().nextBestChoice(choice, condition);
     }
 
@@ -29,11 +28,11 @@ public class PreferenceChooser<T> {
         return nextBestChoice(() -> choice, condition);
     }
 
-    public T defaultChoice(Object choice) {
+    public <T> T defaultChoice(T choice) {
         return defaultChoice(() -> choice);
     }
 
-    public T defaultChoice(Supplier<?> choice) {
+    public <T> T defaultChoice(Supplier<T> choice) {
         for (Map.Entry<Supplier<?>, BooleanSupplier> entry : choiceConditionMap.entrySet()) {
             if (entry.getValue().getAsBoolean()) {
                 return (T) entry.getKey().get();
@@ -42,8 +41,8 @@ public class PreferenceChooser<T> {
         return (T) choice.get();
     }
 
-    public T get() {
-        return defaultChoice((Object) null);
+    public <T> T get() {
+        return defaultChoice((T) null);
     }
 
 }
