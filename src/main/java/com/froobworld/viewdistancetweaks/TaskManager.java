@@ -31,7 +31,9 @@ public class TaskManager {
     public void reload() {
         tpsTracker.unregister();
         limiterTask.cancel();
-        noTickLimiterTask.cancel();
+        if (noTickLimiterTask != null) {
+            noTickLimiterTask.cancel();
+        }
         init();
     }
 
