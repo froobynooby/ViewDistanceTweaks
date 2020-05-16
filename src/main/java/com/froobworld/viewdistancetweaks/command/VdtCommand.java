@@ -49,7 +49,7 @@ public class VdtCommand implements CommandExecutor {
             }
         }
 
-        sender.sendMessage(ChatColor.YELLOW + "ViewDistanceTweeks v" + viewDistanceTweaks.getDescription().getVersion());
+        sender.sendMessage(ChatColor.YELLOW + "View Distance Tweaks v" + viewDistanceTweaks.getDescription().getVersion());
         sender.sendMessage("");
         sender.sendMessage("/" + cl + " reload");
         sender.sendMessage("/" + cl + " status");
