@@ -96,7 +96,6 @@ world-settings:
 
     # These settings concern how we count the number of chunks in this world.
     chunk-counter-settings:
-
       # When two players are near each other, their view distances can overlap. Should we not double count the chunks
       # that are overlapping?
       exclude-overlap: true
