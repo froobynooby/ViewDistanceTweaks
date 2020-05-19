@@ -83,14 +83,13 @@ public class ReactiveAdjustmentMode extends BaseAdjustmentMode {
 
 
         public double getLowestTps(int chunkCount) {
-            final double[] curMin = {20.0};
-            records.values().forEach(record -> {
+            double curMin = 20.0;
+            for (TpsChunkRecord record : records.values()) {
                 if (record.chunkCount <= chunkCount) {
-                    curMin[0] = Math.min(curMin[0], record.tps);
+                    curMin = Math.min(curMin, record.tps);
                 }
-            });
-
-            return curMin[0];
+            }
+            return curMin;
         }
 
         public void addRecord(double tps, int chunkCount) {
