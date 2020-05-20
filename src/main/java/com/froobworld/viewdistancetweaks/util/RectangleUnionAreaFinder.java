@@ -63,7 +63,6 @@ public class RectangleUnionAreaFinder {
                 list.add(this);
                 return list;
             }
-            Rect[] rects = new Rect[4];
 
             // Rect 0 : left side
             {
