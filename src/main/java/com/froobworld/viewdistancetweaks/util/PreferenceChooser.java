@@ -11,7 +11,7 @@ public class PreferenceChooser {
     private PreferenceChooser() {}
 
 
-    public static <T> PreferenceChooser bestChoice(Object choice, BooleanSupplier condition) {
+    public static PreferenceChooser bestChoice(Object choice, BooleanSupplier condition) {
         return bestChoice(() -> choice, condition);
     }
 
