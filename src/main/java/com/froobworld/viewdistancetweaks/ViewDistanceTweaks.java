@@ -59,9 +59,10 @@ public class ViewDistanceTweaks extends JavaPlugin {
     }
 
     private void registerCommands() {
-        getCommand("vdt").setExecutor(new VdtCommand(this));
+        VdtCommand vdtCommand = new VdtCommand(this);
+        getCommand("vdt").setExecutor(vdtCommand);
         getCommand("vdt").setPermission(VdtCommand.PERMISSON);
-        getCommand("vdt").setTabCompleter(VdtCommand.tabCompleter);
+        getCommand("vdt").setTabCompleter(vdtCommand.getTabCompleter());
     }
 
     private void initMetrics() {

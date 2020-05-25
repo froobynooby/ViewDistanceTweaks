@@ -18,14 +18,18 @@ import java.util.stream.IntStream;
 
 public class VdtCommand implements CommandExecutor {
     public static final String PERMISSON = "viewdistancetweaks.command.vdt";
-    public static final TabCompleter tabCompleter = new TabCompleter() {
+    private final TabCompleter tabCompleter = new TabCompleter() {
         @Override
         public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
             if (args.length == 0) {
                 return new ArrayList<>();
             }
             if (args.length == 1) {
-                return StringUtil.copyPartialMatches(args[0], Arrays.asList("reload", "status", "rl", "stats", "set", "set-no-tick"), new ArrayList<>());
+                List<String> possibleCompletions = new ArrayList<>(Arrays.asList("reload", "status", "rl", "stats", "set"));
+                if (viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook() != null) {
+                    possibleCompletions.add("set-no-tick");
+                }
+                return StringUtil.copyPartialMatches(args[0], possibleCompletions, new ArrayList<>());
             }
             if (args.length == 2 && (args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("set-no-tick"))) {
                 return StringUtil.copyPartialMatches(args[1], IntStream.rangeClosed(2, 32).mapToObj(Integer::toString).collect(Collectors.toSet()), new ArrayList<>());
@@ -108,11 +112,15 @@ public class VdtCommand implements CommandExecutor {
         sender.sendMessage("/" + cl + " reload");
         sender.sendMessage("/" + cl + " status");
         sender.sendMessage("/" + cl + " set <view distance> [world] [--duration <minutes>]");
-        sender.sendMessage("/" + cl + " set-no-tick <view distance> [world] [--duration <minutes>]");
+        if (viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook() != null) {
+            sender.sendMessage("/" + cl + " set-no-tick <view distance> [world] [--duration <minutes>]");
+        }
         return true;
     }
 
-
+    public TabCompleter getTabCompleter() {
+        return tabCompleter;
+    }
 
 
 }
