@@ -11,7 +11,10 @@ import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class VdtCommand implements CommandExecutor {
     public static final String PERMISSON = "viewdistancetweaks.command.vdt";
@@ -21,18 +24,47 @@ public class VdtCommand implements CommandExecutor {
             if (args.length == 0) {
                 return new ArrayList<>();
             }
-            return StringUtil.copyPartialMatches(args[0], Arrays.asList("reload", "status", "rl", "stats"), new ArrayList<>());
+            if (args.length == 1) {
+                return StringUtil.copyPartialMatches(args[0], Arrays.asList("reload", "status", "rl", "stats", "set", "set-no-tick"), new ArrayList<>());
+            }
+            if (args.length == 2 && (args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("set-no-tick"))) {
+                return StringUtil.copyPartialMatches(args[1], IntStream.rangeClosed(2, 32).mapToObj(Integer::toString).collect(Collectors.toSet()), new ArrayList<>());
+            }
+            if (args.length > 2 && (args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("set-no-tick"))) {
+                if (Arrays.stream(args).noneMatch(s -> s.equalsIgnoreCase("--duration"))) {
+                    return StringUtil.copyPartialMatches(args[args.length - 1], Collections.singletonList("--duration"), new ArrayList<>());
+                } else {
+                    return StringUtil.copyPartialMatches(args[args.length - 1], Arrays.asList(10 + "", 30 + "", 60 + "", 120 + ""), new ArrayList<>());
+                }
+            }
+            return new ArrayList<>();
         }
     };
 
     private ViewDistanceTweaks viewDistanceTweaks;
     private ReloadCommand reloadCommand;
     private StatusCommand statusCommand;
+    private SetCommand setCommand;
+    private SetCommand setNoTickCommand;
 
     public VdtCommand(ViewDistanceTweaks viewDistanceTweaks) {
         this.viewDistanceTweaks = viewDistanceTweaks;
         reloadCommand = new ReloadCommand(viewDistanceTweaks);
         statusCommand = new StatusCommand(viewDistanceTweaks);
+        setCommand = new SetCommand(
+                viewDistanceTweaks.getTaskManager()::getManualViewDistanceManager,
+                ChatColor.GRAY + "Set view distance of " + ChatColor.RED +  "{0}" + ChatColor.GRAY +
+                        " to " + ChatColor.RED + "{1}" + ChatColor.GRAY + " for " + ChatColor.RED + "{2}" + ChatColor.GRAY + " minutes.",
+                ChatColor.GRAY + "Set view distance of " + ChatColor.RED +  "{0}" + ChatColor.GRAY +
+                        " to " + ChatColor.RED + "{1}" + ChatColor.GRAY + " until next reload."
+        );
+        setNoTickCommand = new SetCommand(
+                viewDistanceTweaks.getTaskManager()::getManualNoTickViewDistanceManager,
+                ChatColor.GRAY + "Set no-tick view distance of " + ChatColor.RED +  "{0}" + ChatColor.GRAY +
+                        " to " + ChatColor.RED + "{1}" + ChatColor.GRAY + " for " + ChatColor.RED + "{2}" + ChatColor.GRAY + " minutes.",
+                ChatColor.GRAY + "Set no-tick view distance of " + ChatColor.RED +  "{0}" + ChatColor.GRAY +
+                        " to " + ChatColor.RED + "{1}" + ChatColor.GRAY + " until next reload."
+        );
     }
 
 
@@ -42,10 +74,32 @@ public class VdtCommand implements CommandExecutor {
 
         if (args.length != 0) {
             if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
-                return reloadCommand.onCommand(sender, command, cl, args);
+                if (CommandUtils.permissionCheck(sender, "viewdistancetweaks.vdt.command.reload")) {
+                    return reloadCommand.onCommand(sender, command, cl, args);
+                } else {
+                    return true;
+                }
             }
             if (args[0].equalsIgnoreCase("status") || args[0].equalsIgnoreCase("stats")) {
-                return statusCommand.onCommand(sender, command, cl, args);
+                if (CommandUtils.permissionCheck(sender, "viewdistancetweaks.vdt.command.status")) {
+                    return statusCommand.onCommand(sender, command, cl, args);
+                } else {
+                    return true;
+                }
+            }
+            if (args[0].equalsIgnoreCase("set")) {
+                if (CommandUtils.permissionCheck(sender, "viewdistancetweaks.vdt.command.set")) {
+                    return setCommand.onCommand(sender, command, cl, args);
+                } else {
+                    return true;
+                }
+            }
+            if (args[0].equalsIgnoreCase("set-no-tick") && viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook() != null) {
+                if (CommandUtils.permissionCheck(sender, "viewdistancetweaks.vdt.command.set-no-tick")) {
+                    return setNoTickCommand.onCommand(sender, command, cl, args);
+                } else {
+                    return true;
+                }
             }
         }
 
@@ -53,6 +107,8 @@ public class VdtCommand implements CommandExecutor {
         sender.sendMessage("");
         sender.sendMessage("/" + cl + " reload");
         sender.sendMessage("/" + cl + " status");
+        sender.sendMessage("/" + cl + " set <view distance> [world] [--duration <minutes>]");
+        sender.sendMessage("/" + cl + " set-no-tick <view distance> [world] [--duration <minutes>]");
         return true;
     }
 

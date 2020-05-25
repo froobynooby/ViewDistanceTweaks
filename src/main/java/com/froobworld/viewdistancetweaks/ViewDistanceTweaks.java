@@ -71,6 +71,10 @@ public class ViewDistanceTweaks extends JavaPlugin {
         return hookManager;
     }
 
+    public TaskManager getTaskManager() {
+        return taskManager;
+    }
+
     public VdtConfig getVdtConfig() {
         return vdtConfig;
     }

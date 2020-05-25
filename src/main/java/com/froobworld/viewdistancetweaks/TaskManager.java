@@ -1,7 +1,8 @@
 package com.froobworld.viewdistancetweaks;
 
 import com.froobworld.viewdistancetweaks.hook.viewdistance.ViewDistanceHook;
-import com.froobworld.viewdistancetweaks.limiter.StartupClampTask;
+import com.froobworld.viewdistancetweaks.limiter.ManualViewDistanceManager;
+import com.froobworld.viewdistancetweaks.limiter.ViewDistanceClamper;
 import com.froobworld.viewdistancetweaks.limiter.ViewDistanceLimiter;
 import com.froobworld.viewdistancetweaks.limiter.adjustmentmode.AdjustmentMode;
 import com.froobworld.viewdistancetweaks.limiter.adjustmentmode.MixedAdjustmentMode;
@@ -15,6 +16,10 @@ public class TaskManager {
     private TpsTracker tpsTracker;
     private ViewDistanceLimiter limiterTask;
     private ViewDistanceLimiter noTickLimiterTask;
+    private ViewDistanceClamper viewDistanceClamper;
+    private ViewDistanceClamper noTickViewDistanceClamper;
+    private ManualViewDistanceManager manualViewDistanceManager;
+    private ManualViewDistanceManager manualNoTickViewDistanceManager;
 
     public TaskManager(ViewDistanceTweaks viewDistanceTweaks) {
         this.viewDistanceTweaks = viewDistanceTweaks;
@@ -23,9 +28,10 @@ public class TaskManager {
 
     public void init() {
         initTpsTracker();
+        initViewDistanceClampers();
+        initManualViewDistanceManagers();
         initLimiterTask();
         initNoTickLimiterTask();
-        clampViewDistances();
     }
 
     public void reload() {
@@ -34,6 +40,8 @@ public class TaskManager {
         if (noTickLimiterTask != null) {
             noTickLimiterTask.cancel();
         }
+        manualViewDistanceManager.cancel();
+        manualNoTickViewDistanceManager.cancel();
         init();
     }
 
@@ -44,6 +52,22 @@ public class TaskManager {
                 viewDistanceTweaks.getVdtConfig().reactiveMode.tpsTracker.trimOutliersPercent.get()
         );
         tpsTracker.register();
+    }
+
+    private void initManualViewDistanceManagers() {
+        manualViewDistanceManager = new ManualViewDistanceManager(
+                viewDistanceTweaks,
+                viewDistanceTweaks.getHookManager().getViewDistanceHook(),
+                viewDistanceClamper
+        );
+        ViewDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook();
+        if (noTickViewDistanceHook != null) {
+            manualNoTickViewDistanceManager = new ManualViewDistanceManager(
+                    viewDistanceTweaks,
+                    noTickViewDistanceHook,
+                    noTickViewDistanceClamper
+            );
+        }
     }
 
     private void initLimiterTask() {
@@ -84,13 +108,14 @@ public class TaskManager {
                 viewDistanceTweaks,
                 viewDistanceTweaks.getHookManager().getViewDistanceHook(),
                 adjustmentMode,
+                manualViewDistanceManager,
                 viewDistanceTweaks.getVdtConfig().logViewDistanceChanges.get(),
                 "Changed view distance of {0} ({1} -> {2})"
         );
         limiterTask.start(viewDistanceTweaks.getVdtConfig().ticksPerCheck.get());
     }
 
-    public void initNoTickLimiterTask() {
+    private void initNoTickLimiterTask() {
         ViewDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook();
         if (viewDistanceTweaks.getVdtConfig().paperSettings.noTickViewDistance.enabled.get() && noTickViewDistanceHook != null) {
             AdjustmentMode noTickAdjustmentMode = new ProactiveAdjustmentMode(
@@ -106,6 +131,7 @@ public class TaskManager {
                     viewDistanceTweaks,
                     noTickViewDistanceHook,
                     noTickAdjustmentMode,
+                    manualNoTickViewDistanceManager,
                     viewDistanceTweaks.getVdtConfig().logViewDistanceChanges.get(),
                     "Changed no-tick view distance of {0} ({1} -> {2})"
             );
@@ -113,22 +139,31 @@ public class TaskManager {
         }
     }
 
-    public void clampViewDistances() {
-        new StartupClampTask(
+    private void initViewDistanceClampers() {
+        viewDistanceClamper = new ViewDistanceClamper(
                 viewDistanceTweaks.getHookManager().getViewDistanceHook(),
                 world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).maximumViewDistance.get(),
                 world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).minimumViewDistance.get()
-        ).runOnWorlds(Bukkit.getWorlds());
+        );
+        viewDistanceClamper.clampWorlds(Bukkit.getWorlds());
 
         ViewDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook();
         if (noTickViewDistanceHook != null && viewDistanceTweaks.getVdtConfig().paperSettings.noTickViewDistance.enabled.get()) {
-            new StartupClampTask(
+            noTickViewDistanceClamper = new ViewDistanceClamper(
                     noTickViewDistanceHook,
                     world -> viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).maximumNoTickViewDistance.get(),
                     world -> viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).minimumNoTickViewDistance.get()
-            ).runOnWorlds(Bukkit.getWorlds());
+            );
+            noTickViewDistanceClamper.clampWorlds(Bukkit.getWorlds());
         }
     }
 
+    public ManualViewDistanceManager getManualViewDistanceManager() {
+        return manualViewDistanceManager;
+    }
+
+    public ManualViewDistanceManager getManualNoTickViewDistanceManager() {
+        return manualNoTickViewDistanceManager;
+    }
 
 }

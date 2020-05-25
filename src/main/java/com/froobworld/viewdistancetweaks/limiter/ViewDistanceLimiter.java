@@ -14,15 +14,17 @@ public class ViewDistanceLimiter implements Runnable {
     private final ViewDistanceTweaks viewDistanceTweaks;
     private final ViewDistanceHook viewDistanceHook;
     private final AdjustmentMode adjustmentMode;
+    private final ManualViewDistanceManager manualViewDistanceManager;
     private final Set<ViewDistanceChangeTask> changeViewDistanceTasks = new HashSet<>();
     private final boolean logChanges;
     private final String logFormat;
     private Integer taskId;
 
-    public ViewDistanceLimiter(ViewDistanceTweaks viewDistanceTweaks, ViewDistanceHook viewDistanceHook, AdjustmentMode adjustmentMode, boolean logChanges, String logFormat) {
+    public ViewDistanceLimiter(ViewDistanceTweaks viewDistanceTweaks, ViewDistanceHook viewDistanceHook, AdjustmentMode adjustmentMode, ManualViewDistanceManager manualViewDistanceManager, boolean logChanges, String logFormat) {
         this.viewDistanceTweaks = viewDistanceTweaks;
         this.viewDistanceHook = viewDistanceHook;
         this.adjustmentMode = adjustmentMode;
+        this.manualViewDistanceManager = manualViewDistanceManager;
         this.logChanges = logChanges;
         this.logFormat = logFormat;
     }
@@ -33,6 +35,7 @@ public class ViewDistanceLimiter implements Runnable {
         if (changeViewDistanceTasks.isEmpty()) {
             List<World> nonEmptyWorlds = Bukkit.getWorlds().stream()
                     .filter(world -> !world.getPlayers().isEmpty())
+                    .filter(world -> !manualViewDistanceManager.hasManuallySetViewDistance(world))
                     .collect(Collectors.toList());
             Map<World, AdjustmentMode.Adjustment> adjustments = adjustmentMode.getAdjustments(nonEmptyWorlds);
 
