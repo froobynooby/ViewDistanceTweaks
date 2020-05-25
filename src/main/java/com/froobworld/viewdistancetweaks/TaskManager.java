@@ -41,7 +41,9 @@ public class TaskManager {
             noTickLimiterTask.cancel();
         }
         manualViewDistanceManager.cancel();
-        manualNoTickViewDistanceManager.cancel();
+        if (manualNoTickViewDistanceManager != null) {
+            manualNoTickViewDistanceManager.cancel();
+        }
         init();
     }
 
