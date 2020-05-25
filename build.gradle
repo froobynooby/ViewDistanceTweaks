@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.froobworld'
-version '1.1.2'
+version '1.2.0'
 jar.enabled = false;
 
 sourceCompatibility = 1.8
