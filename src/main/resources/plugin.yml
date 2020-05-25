@@ -14,13 +14,13 @@ permissions:
     default: op
     description: Access to all /vdt subcommands.
     children:
-      viewdistancetweaks.vdt.command: true
+      viewdistancetweaks.command.vdt: true
       viewdistancetweaks.vdt.command.reload: true
       viewdistancetweaks.vdt.command.status: true
       viewdistancetweaks.vdt.command.set: true
       viewdistancetweaks.vdt.command.set-no-tick: true
 
-  viewdistancetweaks.vdt.command:
+  viewdistancetweaks.command.vdt:
     default: op
     description: Access the /vdt command.
 
@@ -28,22 +28,22 @@ permissions:
     default: op
     description: Access the /vdt reload command.
     children:
-      viewdistancetweaks.vdt.command: true
+      viewdistancetweaks.command.vdt: true
 
   viewdistancetweaks.vdt.command.status:
     default: op
     description: Access the /vdt status command.
     children:
-      viewdistancetweaks.vdt.command: true
+      viewdistancetweaks.command.vdt: true
 
   viewdistancetweaks.vdt.command.set:
     default: op
     description: Access the /vdt set command.
     children:
-      viewdistancetweaks.vdt.command: true
+      viewdistancetweaks.command.vdt: true
 
   viewdistancetweaks.vdt.command.set-no-tick:
     default: op
     description: Access the /vdt set-no-tick command.
     children:
-      viewdistancetweaks.vdt.command: true
+      viewdistancetweaks.command.vdt: true
