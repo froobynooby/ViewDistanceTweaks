@@ -38,7 +38,7 @@ public class PreferenceChooser {
                 return (T) entry.getKey().get();
             }
         }
-        return (T) choice.get();
+        return choice.get();
     }
 
     public <T> T get() {

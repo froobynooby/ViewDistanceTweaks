@@ -36,7 +36,7 @@ public class TpsTracker implements Consumer<Integer> {
     }
 
     private double getAverageTickTime() {
-        return tickDurations.size() < collectionPeriod ? 50.0 : (double) tickDurationSum / (double) collectionPeriod;
+        return tickDurations.size() < collectionPeriod ? 50.0 : tickDurationSum / (double) collectionPeriod;
     }
 
     public double getTps() {

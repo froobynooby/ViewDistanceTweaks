@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class VdtCommand implements CommandExecutor {
-    public static final String PERMISSON = "viewdistancetweaks.command.vdt";
+    public static final String PERMISSION = "viewdistancetweaks.command.vdt";
     private final TabCompleter tabCompleter = new TabCompleter() {
         @Override
         public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
@@ -74,7 +74,7 @@ public class VdtCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String cl, String[] args) {
-        if (!CommandUtils.permissionCheck(sender, PERMISSON)) return true;
+        if (!CommandUtils.permissionCheck(sender, PERMISSION)) return true;
 
         if (args.length != 0) {
             if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {

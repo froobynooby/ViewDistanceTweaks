@@ -61,7 +61,7 @@ public class ViewDistanceTweaks extends JavaPlugin {
     private void registerCommands() {
         VdtCommand vdtCommand = new VdtCommand(this);
         getCommand("vdt").setExecutor(vdtCommand);
-        getCommand("vdt").setPermission(VdtCommand.PERMISSON);
+        getCommand("vdt").setPermission(VdtCommand.PERMISSION);
         getCommand("vdt").setTabCompleter(vdtCommand.getTabCompleter());
     }
 
