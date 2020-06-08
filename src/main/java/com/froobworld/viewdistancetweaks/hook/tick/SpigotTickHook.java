@@ -19,7 +19,7 @@ public class SpigotTickHook implements TickHook {
 
     @Override
     public void register(ViewDistanceTweaks viewDistanceTweaks) {
-        if (taskId != null) {
+        if (taskId == null) {
             taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(
                     viewDistanceTweaks,
                     () -> tickCallback(getCurrentTick()),
