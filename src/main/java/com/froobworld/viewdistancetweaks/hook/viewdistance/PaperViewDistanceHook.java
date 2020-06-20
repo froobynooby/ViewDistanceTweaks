@@ -1,6 +1,8 @@
 package com.froobworld.viewdistancetweaks.hook.viewdistance;
 
 import com.froobworld.viewdistancetweaks.util.ViewDistanceUtils;
+import org.apache.commons.lang.NotImplementedException;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 public class PaperViewDistanceHook extends SpigotViewDistanceHook {
@@ -20,6 +22,13 @@ public class PaperViewDistanceHook extends SpigotViewDistanceHook {
         } catch (Exception e) {
             return false;
         }
+        try {
+            for (World world : Bukkit.getWorlds()) {
+                world.setViewDistance(0);
+            }
+        } catch (NotImplementedException e) {
+            return false;
+        } catch (Exception ignored) {}
         return true;
     }
 

@@ -1,6 +1,8 @@
 package com.froobworld.viewdistancetweaks.hook.viewdistance.notick;
 
 import com.froobworld.viewdistancetweaks.util.ViewDistanceUtils;
+import org.apache.commons.lang.NotImplementedException;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 public class PaperNoTickViewDistanceHook implements NoTickViewDistanceHook {
@@ -25,6 +27,13 @@ public class PaperNoTickViewDistanceHook implements NoTickViewDistanceHook {
         } catch (Exception ex) {
             return false;
         }
+        try {
+            for (World world : Bukkit.getWorlds()) {
+                world.setNoTickViewDistance(0);
+            }
+        } catch (NotImplementedException e) {
+            return false;
+        } catch (Exception ignored) {}
         return true;
     }
 
