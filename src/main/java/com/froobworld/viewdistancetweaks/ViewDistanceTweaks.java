@@ -3,6 +3,7 @@ package com.froobworld.viewdistancetweaks;
 import com.froobworld.viewdistancetweaks.command.VdtCommand;
 import com.froobworld.viewdistancetweaks.config.VdtConfig;
 import com.froobworld.viewdistancetweaks.metrics.VdtMetrics;
+import com.froobworld.viewdistancetweaks.placeholder.VdtExpansion;
 import com.froobworld.viewdistancetweaks.util.*;
 import com.froobworld.viewdistancetweaks.metrics.Metrics;
 import org.bukkit.Bukkit;
@@ -46,6 +47,12 @@ public class ViewDistanceTweaks extends JavaPlugin {
         taskManager.init();
         registerCommands();
         initMetrics();
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceHolderAPI") != null) {
+            if (new VdtExpansion(this).register()) {
+                getLogger().info("Registered expansion for PlaceHolderAPI.");
+            }
+        }
 
         getLogger().info("Finished startup.");
     }
