@@ -48,7 +48,7 @@ public class ViewDistanceTweaks extends JavaPlugin {
         registerCommands();
         initMetrics();
 
-        if (Bukkit.getPluginManager().getPlugin("PlaceHolderAPI") != null) {
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             if (new VdtExpansion(this).register()) {
                 getLogger().info("Registered expansion for PlaceHolderAPI.");
             }
