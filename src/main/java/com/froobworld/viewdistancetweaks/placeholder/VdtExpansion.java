@@ -61,7 +61,7 @@ public class VdtExpansion extends PlaceholderExpansion {
             } else if (params.startsWith("no_tick_view_distance_")) {
                 world = Bukkit.getWorld(params.replace("no_tick_view_distance_", ""));
             }
-            return world == null ? null : ("" + viewDistanceTweaks.getHookManager().getViewDistanceHook().getViewDistance(world));
+            return world == null ? null : ("" + noTickViewDistanceHook.getViewDistance(world));
         }
 
         if (params.startsWith("tick_chunk_count")) {
