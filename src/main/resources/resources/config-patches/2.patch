@@ -1,0 +1,47 @@
+[add-section]
+before = world-settings
+key = paper-settings.alternative-reactive-mode-settings
+comment = # These settings are an alternative option to the reactive-mode-settings, allowing view distance to be adjusted based\n# on MSPT rather than TPS.\n#  * MSPT stands for "milliseconds per tick", and tells you how long your server takes to tick on average. A server\n#    whose MSPT is above 50 will notice things slowing down, as the TPS drops.
+
+[add-field]
+key = paper-settings.alternative-reactive-mode-settings.use-alternative-settings
+value = false
+comment = # Should we use these alternative settings for reactive mode?
+
+[add-field]
+key = paper-settings.alternative-reactive-mode-settings.increase-mspt-threshold
+value = 40.0
+comment = # Below what MSPT should we considering increasing the view distance?
+
+[add-field]
+key = paper-settings.alternative-reactive-mode-settings.decrease-mspt-threshold
+value = 47.0
+comment = # Above what MSPT should we consider decreasing the view distance?
+
+[add-section]
+key = paper-settings.alternative-reactive-mode-settings.mspt-tracker-settings
+comment = # These settings concern how we determine the server's MSPT.\n#  * Only touch these settings if you know what you're doing.
+
+[add-field]
+key = paper-settings.alternative-reactive-mode-settings.mspt-tracker-settings.collection-period
+value = 1200
+comment = # Over how many ticks should we collect tick durations for calculating the MSPT?\n#  * Setting this too high will make the MSPT very slow to react to changes.\n#  * Setting this too low will make the MSPT volatile.
+
+[add-field]
+key = paper-settings.alternative-reactive-mode-settings.mspt-tracker-settings.trim-outliers-to-within
+value = 100.0
+comment = # By how much (in percent) should we allow the tick durations we use to calculate the TPS vary from the average\n# tick duration.\n#  * This is used for smoothing the MSPT; making sure it's not heavily affected by sudden large lag spikes, such\n#    as those caused by garbage collections or world-saves.\n#  * Setting this to 0 will mean your MSPT will never change - don't do that.
+
+[add-section]
+key = paper-settings.alternative-reactive-mode-settings.mspt-prediction
+comment = # We keep a history of MSPT vs. player-loaded chunk count in order to better predict what the MSPT will settle to\n# after increasing the view distance.
+
+[add-field]
+key = paper-settings.alternative-reactive-mode-settings.mspt-prediction.enabled
+value = true
+comment = # Should we use MSPT prediction when we are considering increasing the view distance?\n#  * For example, we may be at 38 MSPT with a view distance of 6, meaning we would consider increasing the view\n#    distance to 7. However, if we saw that 10 minutes ago with a view distance of 7 we had 48 MSPT, we would hold\n#    off on increasing.\n#  * Disabling this can lead to a back-and-forth game of increasing and decreasing the view distance every few\n#    minutes - not ideal.
+
+[add-field]
+key = paper-settings.alternative-reactive-mode-settings.mspt-prediction.history-length
+value = 30
+comment = # For how long (in minutes) should we keep a MSPT / chunk count history?

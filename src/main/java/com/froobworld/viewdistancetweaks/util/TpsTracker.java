@@ -25,11 +25,11 @@ public class TpsTracker implements Consumer<Integer> {
 
 
     public void register() {
-        tickHook.addTickCallback(this);
+        tickHook.addTickStartCallback(this);
     }
 
     public void unregister() {
-        tickHook.removeTickCallback(this);
+        tickHook.removeTickStartCallback(this);
         tickDurationSum = 0;
         lastTickTime = 0;
         tickDurations.clear();

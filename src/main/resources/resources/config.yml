@@ -3,7 +3,7 @@
 # Github: https://github.com/froobynooby/ViewDistanceTweaks
 
 # Please don't change this!
-version: 2
+version: 3
 
 # Set this to true to enable the plugin. The plugin is initially disabled so that you can make changes to the config
 # appropriate to your server.
@@ -122,6 +122,49 @@ paper-settings:
     #  * As an example, 6720 is the number of chunks loaded by the no-tick view distance for 20 players with a no-tick
     #    view distance of 12, and a standard view distance of 8.
     global-chunk-count-target: 6720
+
+  # These settings are an alternative option to the reactive-mode-settings, allowing view distance to be adjusted based
+  # on MSPT rather than TPS.
+  #  * MSPT stands for "milliseconds per tick", and tells you how long your server takes to tick on average. A server
+  #    whose MSPT is above 50 will notice things slowing down, as the TPS drops.
+  alternative-reactive-mode-settings:
+    # Should we use these alternative settings for reactive mode?
+    use-alternative-settings: false
+
+    # Below what MSPT should we considering increasing the view distance?
+    increase-mspt-threshold: 40.0
+
+    # Above what MSPT should we consider decreasing the view distance?
+    decrease-mspt-threshold: 47.0
+
+    # These settings concern how we determine the server's MSPT.
+    #  * Only touch these settings if you know what you're doing.
+    mspt-tracker-settings:
+      # Over how many ticks should we collect tick durations for calculating the MSPT?
+      #  * Setting this too high will make the MSPT very slow to react to changes.
+      #  * Setting this too low will make the MSPT volatile.
+      collection-period: 1200
+
+      # By how much (in percent) should we allow the tick durations we use to calculate the TPS vary from the average
+      # tick duration.
+      #  * This is used for smoothing the MSPT; making sure it's not heavily affected by sudden large lag spikes, such
+      #    as those caused by garbage collections or world-saves.
+      #  * Setting this to 0 will mean your MSPT will never change - don't do that.
+      trim-outliers-to-within: 100.0
+
+    # We keep a history of MSPT vs. player-loaded chunk count in order to better predict what the MSPT will settle to
+    # after increasing the view distance.
+    mspt-prediction:
+      # Should we use MSPT prediction when we are considering increasing the view distance?
+      #  * For example, we may be at 38 MSPT with a view distance of 6, meaning we would consider increasing the view
+      #    distance to 7. However, if we saw that 10 minutes ago with a view distance of 7 we had 48 MSPT, we would hold
+      #    off on increasing.
+      #  * Disabling this can lead to a back-and-forth game of increasing and decreasing the view distance every few
+      #    minutes - not ideal.
+      enabled: true
+
+      # For how long (in minutes) should we keep a MSPT / chunk count history?
+      history-length: 30
 
   world-settings:
     default:

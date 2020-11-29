@@ -11,7 +11,7 @@ import org.bukkit.World;
 import java.io.File;
 
 public class VdtConfig extends NabConfiguration {
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
 
     public VdtConfig(ViewDistanceTweaks viewDistanceTweaks) {
         super(
@@ -130,6 +130,48 @@ public class VdtConfig extends NabConfiguration {
 
             @Entry(key = "global-chunk-count-target")
             public final ConfigEntry<Integer> globalChunkCountTarget = new ConfigEntry<>();
+
+        }
+
+        @Section(key = "alternative-reactive-mode-settings")
+        public final AlternativeReactiveModeSettings alternativeReactiveModeSettings = new AlternativeReactiveModeSettings();
+
+        public static class AlternativeReactiveModeSettings extends ConfigSection {
+
+            @Entry(key = "use-alternative-settings")
+            public final ConfigEntry<Boolean> useAlternativeSettings = new ConfigEntry<>();
+
+            @Entry(key = "decrease-mspt-threshold")
+            public final ConfigEntry<Double> decreaseMsptThreshold = ConfigEntries.doubleEntry();
+
+            @Entry(key = "increase-mspt-threshold")
+            public final ConfigEntry<Double> increaseMsptThreshold = ConfigEntries.doubleEntry();
+
+            @Section(key = "mspt-prediction")
+            public final MsptPredictionSettings msptPrediction = new MsptPredictionSettings();
+
+            @Section(key = "mspt-tracker-settings")
+            public final MsptTrackerSettings msptTracker = new MsptTrackerSettings();
+
+            public static class MsptTrackerSettings extends ConfigSection {
+
+                @Entry(key = "collection-period")
+                public final ConfigEntry<Integer> collectionPeriod = ConfigEntries.integerEntry();
+
+                @Entry(key = "trim-outliers-to-within")
+                public final ConfigEntry<Double> trimOutliersPercent= ConfigEntries.doubleEntry();
+
+            }
+
+            public static class MsptPredictionSettings extends ConfigSection {
+
+                @Entry(key = "enabled")
+                public final ConfigEntry<Boolean> enabled = new ConfigEntry<>();
+
+                @Entry(key = "history-length")
+                public final ConfigEntry<Long> historyLength = ConfigEntries.longEntry();
+
+            }
 
         }
 
