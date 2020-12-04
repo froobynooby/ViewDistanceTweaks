@@ -187,6 +187,14 @@ public class TaskManager {
         }
     }
 
+    public TpsTracker getTpsTracker() {
+        return tpsTracker;
+    }
+
+    public MsptTracker getMsptTracker() {
+        return msptTracker;
+    }
+
     public ManualViewDistanceManager getManualViewDistanceManager() {
         return manualViewDistanceManager;
     }

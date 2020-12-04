@@ -1,14 +1,19 @@
 package com.froobworld.viewdistancetweaks.placeholder;
 
 import com.froobworld.viewdistancetweaks.ViewDistanceTweaks;
+import com.froobworld.viewdistancetweaks.hook.tick.PaperTickHook;
 import com.froobworld.viewdistancetweaks.hook.viewdistance.ViewDistanceHook;
 import com.froobworld.viewdistancetweaks.hook.viewdistance.notick.NoTickViewDistanceHook;
 import com.froobworld.viewdistancetweaks.util.ChunkCounter;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class VdtExpansion extends PlaceholderExpansion {
     private static final String IDENTIFIER = "viewdistancetweaks";
@@ -122,6 +127,36 @@ public class VdtExpansion extends PlaceholderExpansion {
                 }
             }
             return "" + count;
+        }
+
+        if (params.equalsIgnoreCase("tps_colour") || params.equalsIgnoreCase("tps_color")) {
+            double tps = viewDistanceTweaks.getTaskManager().getTpsTracker().getTps();
+            if (tps < 16) {
+                return ChatColor.RED + "";
+            } else if (tps < 18) {
+                return ChatColor.YELLOW + "";
+            } else {
+                return ChatColor.GREEN + "";
+            }
+        }
+
+        if (PaperTickHook.isCompatible() && (params.equalsIgnoreCase("mspt_colour") || params.equalsIgnoreCase("mspt_color"))) {
+            double mspt = viewDistanceTweaks.getTaskManager().getMsptTracker().getMspt();
+            if (mspt > 50) {
+                return ChatColor.RED + "";
+            } else if (mspt > 40) {
+                return ChatColor.YELLOW + "";
+            } else {
+                return ChatColor.GREEN + "";
+            }
+        }
+
+        if (params.equalsIgnoreCase("tps")) {
+            return BigDecimal.valueOf(Math.min(viewDistanceTweaks.getTaskManager().getTpsTracker().getTps(), 20)).setScale(2, RoundingMode.HALF_UP).toString();
+        }
+
+        if (PaperTickHook.isCompatible() && params.equalsIgnoreCase("mspt")) {
+            return BigDecimal.valueOf(viewDistanceTweaks.getTaskManager().getMsptTracker().getMspt()).setScale(2, RoundingMode.HALF_UP).toString();
         }
 
         return null;
