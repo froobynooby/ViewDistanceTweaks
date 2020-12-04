@@ -9,6 +9,10 @@ import com.froobworld.viewdistancetweaks.limiter.adjustmentmode.*;
 import com.froobworld.viewdistancetweaks.util.MsptTracker;
 import com.froobworld.viewdistancetweaks.util.TpsTracker;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TaskManager {
     private ViewDistanceTweaks viewDistanceTweaks;
@@ -176,7 +180,11 @@ public class TaskManager {
                 world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).maximumViewDistance.get(),
                 world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).minimumViewDistance.get()
         );
-        viewDistanceClamper.clampWorlds(Bukkit.getWorlds());
+
+        List<World> worldsToClamp = Bukkit.getWorlds().stream()
+                .filter(world -> !viewDistanceTweaks.getVdtConfig().worldSettings.of(world).exclude.get())
+                .collect(Collectors.toList());
+        viewDistanceClamper.clampWorlds(worldsToClamp);
 
         ViewDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook();
         if (noTickViewDistanceHook != null && viewDistanceTweaks.getVdtConfig().paperSettings.noTickViewDistance.enabled.get()) {
@@ -185,7 +193,7 @@ public class TaskManager {
                     world -> viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).maximumNoTickViewDistance.get(),
                     world -> viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).minimumNoTickViewDistance.get()
             );
-            noTickViewDistanceClamper.clampWorlds(Bukkit.getWorlds());
+            noTickViewDistanceClamper.clampWorlds(worldsToClamp);
         }
     }
 
