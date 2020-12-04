@@ -21,10 +21,11 @@ public class StatusCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        boolean weightedCounts = args.length > 1 && args[1].equalsIgnoreCase("--weight");
         ViewDistanceHook viewDistanceHook = viewDistanceTweaks.getHookManager().getViewDistanceHook();
         ViewDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook();
-        ChunkCounter chunkCounter = viewDistanceTweaks.getHookManager().getChunkCounter();
-        ChunkCounter noTickChunkCounter = viewDistanceTweaks.getHookManager().getNoTickChunkCounter();
+        ChunkCounter chunkCounter = weightedCounts ? viewDistanceTweaks.getHookManager().getChunkCounter() : viewDistanceTweaks.getHookManager().getActualChunkCounter();
+        ChunkCounter noTickChunkCounter = weightedCounts ? viewDistanceTweaks.getHookManager().getNoTickChunkCounter() : viewDistanceTweaks.getHookManager().getActualNoTickChunkCounter();
 
         String statusMessage = ChatColor.RED + "{0} " + ChatColor.GRAY + "/" + ChatColor.RED + " {1}";
         String noTickStatusMessage = ChatColor.RED + "{0} " + ChatColor.GRAY + "/" + ChatColor.RED + " {1} " + ChatColor.GRAY + "/" + ChatColor.RED + " {2} " + ChatColor.GRAY + "/" + ChatColor.RED + " {3}";

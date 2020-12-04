@@ -41,6 +41,9 @@ public class VdtCommand implements CommandExecutor {
                     return StringUtil.copyPartialMatches(args[args.length - 1], Arrays.asList(10 + "", 30 + "", 60 + "", 120 + ""), new ArrayList<>());
                 }
             }
+            if (args.length == 2 && (args[0].equalsIgnoreCase("status") || args[0].equalsIgnoreCase("stats"))) {
+                return StringUtil.copyPartialMatches(args[1], Collections.singletonList("--weight"), new ArrayList<>());
+            }
             return new ArrayList<>();
         }
     };
@@ -110,7 +113,7 @@ public class VdtCommand implements CommandExecutor {
         sender.sendMessage(ChatColor.YELLOW + "View Distance Tweaks v" + viewDistanceTweaks.getDescription().getVersion());
         sender.sendMessage("");
         sender.sendMessage("/" + cl + " reload");
-        sender.sendMessage("/" + cl + " status");
+        sender.sendMessage("/" + cl + " status [--weight]");
         sender.sendMessage("/" + cl + " set <view distance> [world] [--duration <minutes>]");
         if (viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook() != null) {
             sender.sendMessage("/" + cl + " set-no-tick <view distance> [world] [--duration <minutes>]");

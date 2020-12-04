@@ -20,6 +20,8 @@ public class HookManager {
     private NoTickViewDistanceHook noTickViewDistanceHook;
     private ChunkCounter chunkCounter;
     private ChunkCounter noTickChunkCounter;
+    private ChunkCounter actualChunkCounter;
+    private ChunkCounter actualNoTickChunkCounter;
 
     public HookManager(ViewDistanceTweaks viewDistanceTweaks) {
         this.viewDistanceTweaks = viewDistanceTweaks;
@@ -44,6 +46,14 @@ public class HookManager {
 
     public ChunkCounter getNoTickChunkCounter() {
         return noTickChunkCounter;
+    }
+
+    public ChunkCounter getActualChunkCounter() {
+        return actualChunkCounter;
+    }
+
+    public ChunkCounter getActualNoTickChunkCounter() {
+        return actualNoTickChunkCounter;
     }
 
     public void init() {
@@ -73,6 +83,15 @@ public class HookManager {
                 viewDistanceHook,
                 world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).chunkWeight.get(),
                 world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).chunkCounter.excludeOverlap.get()
+        );
+        actualChunkCounter = new StandardChunkCounter(
+                world -> 1.0,
+                world -> true
+        );
+        actualNoTickChunkCounter = new NoTickChunkCounter(
+                viewDistanceHook,
+                world -> 1.0,
+                world -> true
         );
     }
 
