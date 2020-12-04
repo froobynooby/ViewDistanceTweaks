@@ -70,15 +70,13 @@ public class TaskManager {
     private void initManualViewDistanceManagers() {
         manualViewDistanceManager = new ManualViewDistanceManager(
                 viewDistanceTweaks,
-                viewDistanceTweaks.getHookManager().getViewDistanceHook(),
-                viewDistanceClamper
+                viewDistanceTweaks.getHookManager().getViewDistanceHook()
         );
         ViewDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook();
         if (noTickViewDistanceHook != null) {
             manualNoTickViewDistanceManager = new ManualViewDistanceManager(
                     viewDistanceTweaks,
-                    noTickViewDistanceHook,
-                    noTickViewDistanceClamper
+                    noTickViewDistanceHook
             );
         }
     }
