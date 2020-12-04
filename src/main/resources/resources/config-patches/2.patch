@@ -1,3 +1,9 @@
+[add-field]
+before = minimum-view-distance
+key = world-settings.default.exclude
+value = false
+comment = # Should we not manage the view distance in this world?\n#  * Note: Even if excluded, the world's chunks will be counted for the purpose of adjusting the view distance of\n#    other worlds. If you do not want this, also be sure to set the chunk-weight to 0.
+
 [add-section]
 before = world-settings
 key = paper-settings.alternative-reactive-mode-settings

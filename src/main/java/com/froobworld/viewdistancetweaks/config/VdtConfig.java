@@ -94,6 +94,9 @@ public class VdtConfig extends NabConfiguration {
 
     public static class WorldSettings extends ConfigSection {
 
+        @Entry(key = "exclude")
+        public final ConfigEntry<Boolean> exclude = new ConfigEntry<>();
+
         @Entry(key = "minimum-view-distance")
         public final ConfigEntry<Integer> minimumViewDistance = new ConfigEntry<>();
 

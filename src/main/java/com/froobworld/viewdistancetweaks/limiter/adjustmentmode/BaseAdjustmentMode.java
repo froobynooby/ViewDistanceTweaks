@@ -11,14 +11,16 @@ import java.util.function.Function;
 public abstract class BaseAdjustmentMode implements AdjustmentMode {
     private final Map<UUID, AdjustmentHistory> worldAdjustmentHistory = new HashMap<>();
     private final ViewDistanceHook viewDistanceHook;
+    private final Function<World, Boolean> exclude;
     private final Function<World, Integer> maximumViewDistance;
     private final Function<World, Integer> minimumViewDistance;
     private final int requiredIncrease;
     private final int requiredDecrease;
 
-    public BaseAdjustmentMode(ViewDistanceHook viewDistanceHook, Function<World, Integer> maximumViewDistance, Function<World, Integer> minimumViewDistance,
+    public BaseAdjustmentMode(ViewDistanceHook viewDistanceHook, Function<World,Boolean> exclude, Function<World, Integer> maximumViewDistance, Function<World, Integer> minimumViewDistance,
                               int requiredIncrease, int requiredDecrease) {
         this.viewDistanceHook = viewDistanceHook;
+        this.exclude = exclude;
         this.maximumViewDistance = maximumViewDistance;
         this.minimumViewDistance = minimumViewDistance;
         this.requiredIncrease = requiredIncrease;
@@ -27,11 +29,17 @@ public abstract class BaseAdjustmentMode implements AdjustmentMode {
 
 
     public Adjustment tryIncrease(World world) {
+        if (exclude.apply(world)) {
+            return Adjustment.STAY;
+        }
         return getAdjustmentHistory(world).increase() < requiredIncrease ? Adjustment.STAY :
                 viewDistanceHook.getViewDistance(world) < maximumViewDistance.apply(world) ? Adjustment.INCREASE : Adjustment.STAY;
     }
 
     public Adjustment tryDecrease(World world) {
+        if (exclude.apply(world)) {
+            return Adjustment.STAY;
+        }
         return getAdjustmentHistory(world).decrease() < requiredDecrease ? Adjustment.STAY :
                 viewDistanceHook.getViewDistance(world) > minimumViewDistance.apply(world) ? Adjustment.DECREASE : Adjustment.STAY;
     }

@@ -21,9 +21,9 @@ public class AlternativeReactiveAdjustmentMode extends BaseAdjustmentMode {
     private final boolean useMsptChunkHistory;
 
     public AlternativeReactiveAdjustmentMode(MsptTracker msptTracker, ChunkCounter chunkCounter, double increaseMsptThreshold, double decreaseMsptThreshold, long msptChunkHistoryLength,
-                                             boolean useMsptChunkHistory, ViewDistanceHook viewDistanceHook, Function<World, Integer> maxViewDistance,
+                                             boolean useMsptChunkHistory, ViewDistanceHook viewDistanceHook, Function<World, Boolean> exclude, Function<World, Integer> maxViewDistance,
                                              Function<World, Integer> minViewDistance, int requiredIncrease, int requiredDecrease) {
-        super(viewDistanceHook, maxViewDistance, minViewDistance, requiredIncrease, requiredDecrease);
+        super(viewDistanceHook, exclude, maxViewDistance, minViewDistance, requiredIncrease, requiredDecrease);
         this.msptTracker = msptTracker;
         this.viewDistanceHook = viewDistanceHook;
         this.chunkCounter = chunkCounter;

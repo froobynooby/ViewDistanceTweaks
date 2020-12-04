@@ -83,6 +83,11 @@ log-view-distance-changes: false
 # settings listed under the default section.
 world-settings:
   default:
+    # Should we not manage the view distance in this world?
+    #  * Note: Even if excluded, the world's chunks will be counted for the purpose of adjusting the view distance of
+    #    other worlds. If you do not want this, also be sure to set the chunk-weight to 0.
+    exclude: false
+
     # What should the absolute minimum view distance be in this world?
     minimum-view-distance: 6
 

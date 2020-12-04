@@ -21,9 +21,9 @@ public class ReactiveAdjustmentMode extends BaseAdjustmentMode {
     private final boolean useTpsChunkHistory;
 
     public ReactiveAdjustmentMode(TpsTracker tpsTracker, ChunkCounter chunkCounter, double increaseTpsThreshold, double decreaseTpsThreshold, long tpsChunkHistoryLength,
-                                  boolean useTpsChunkHistory, ViewDistanceHook viewDistanceHook, Function<World, Integer> maxViewDistance,
+                                  boolean useTpsChunkHistory, ViewDistanceHook viewDistanceHook, Function<World, Boolean> exclude, Function<World, Integer> maxViewDistance,
                                   Function<World, Integer> minViewDistance, int requiredIncrease, int requiredDecrease) {
-        super(viewDistanceHook, maxViewDistance, minViewDistance, requiredIncrease, requiredDecrease);
+        super(viewDistanceHook, exclude, maxViewDistance, minViewDistance, requiredIncrease, requiredDecrease);
         this.tpsTracker = tpsTracker;
         this.viewDistanceHook = viewDistanceHook;
         this.chunkCounter = chunkCounter;

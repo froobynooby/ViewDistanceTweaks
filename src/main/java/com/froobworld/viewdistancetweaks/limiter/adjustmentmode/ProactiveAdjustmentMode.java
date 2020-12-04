@@ -14,9 +14,9 @@ public class ProactiveAdjustmentMode extends BaseAdjustmentMode {
     private final ViewDistanceHook viewDistanceHook;
     private final ChunkCounter chunkCounter;
 
-    public ProactiveAdjustmentMode(int globalChunkCountTarget, ViewDistanceHook viewDistanceHook, ChunkCounter chunkCounter, Function<World, Integer> maxViewDistance,
+    public ProactiveAdjustmentMode(int globalChunkCountTarget, ViewDistanceHook viewDistanceHook, ChunkCounter chunkCounter, Function<World, Boolean> exclude, Function<World, Integer> maxViewDistance,
                                    Function<World, Integer> minViewDistance, int requiredForIncrease, int requiredForDecrease) {
-        super(viewDistanceHook, maxViewDistance, minViewDistance, requiredForIncrease, requiredForDecrease);
+        super(viewDistanceHook, exclude, maxViewDistance, minViewDistance, requiredForIncrease, requiredForDecrease);
         this.globalChunkCountTarget = globalChunkCountTarget;
         this.viewDistanceHook = viewDistanceHook;
         this.chunkCounter = chunkCounter;
