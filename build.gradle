@@ -31,7 +31,7 @@ dependencies {
     compileOnly 'com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.10.9'
     compile 'org.jooq:joor-java-8:0.9.13'
-    compile 'com.froobworld:nab-configuration:1.0.0'
+    compile 'com.froobworld:nab-configuration:1.0.1'
 }
 
 processResources {
