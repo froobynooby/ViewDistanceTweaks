@@ -42,6 +42,16 @@ public class VdtExpansion extends PlaceholderExpansion {
     }
 
     @Override
+    public boolean persist() {
+        return true;
+    }
+
+    @Override
+    public boolean canRegister() {
+        return true;
+    }
+
+    @Override
     public String onPlaceholderRequest(Player player, @NotNull String params) {
         ViewDistanceHook viewDistanceHook = viewDistanceTweaks.getHookManager().getViewDistanceHook();
         ChunkCounter chunkCounter = viewDistanceTweaks.getHookManager().getChunkCounter();
