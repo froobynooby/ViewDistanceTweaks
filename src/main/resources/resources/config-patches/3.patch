@@ -1,0 +1,5 @@
+[add-field]
+key=paper-settings.world-settings.default.exclude
+before=minimum-no-tick-view-distance
+value=false
+comment=# Should we not manage the no-tick view distance in this world?\n#  * Note: Even if excluded, the world's chunks will be counted for the purpose of adjusting the no-tick view\n#    distance of other worlds.

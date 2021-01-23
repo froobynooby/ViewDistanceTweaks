@@ -3,7 +3,7 @@
 # Github: https://github.com/froobynooby/ViewDistanceTweaks
 
 # Please don't change this!
-version: 3
+version: 4
 
 # Set this to true to enable the plugin. The plugin is initially disabled so that you can make changes to the config
 # appropriate to your server.
@@ -173,6 +173,11 @@ paper-settings:
 
   world-settings:
     default:
+      # Should we not manage the no-tick view distance in this world?
+      #  * Note: Even if excluded, the world's chunks will be counted for the purpose of adjusting the no-tick view
+      #    distance of other worlds.
+      exclude: false
+
       # What should the absolute minimum no-tick view distance be in this world?
       minimum-no-tick-view-distance: 8
 

@@ -156,7 +156,7 @@ public class TaskManager {
                     viewDistanceTweaks.getVdtConfig().paperSettings.noTickViewDistance.globalChunkCountTarget.get(),
                     noTickViewDistanceHook,
                     viewDistanceTweaks.getHookManager().getNoTickChunkCounter(),
-                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).exclude.get(),
+                    world -> viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).exclude.get(),
                     world -> viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).maximumNoTickViewDistance.get(),
                     world -> viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).minimumNoTickViewDistance.get(),
                     viewDistanceTweaks.getVdtConfig().passedChecksForIncrease.get(),
@@ -186,6 +186,9 @@ public class TaskManager {
                 .collect(Collectors.toList());
         viewDistanceClamper.clampWorlds(worldsToClamp);
 
+        worldsToClamp = Bukkit.getWorlds().stream()
+                .filter(world -> !viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).exclude.get())
+                .collect(Collectors.toList());
         ViewDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook();
         if (noTickViewDistanceHook != null && viewDistanceTweaks.getVdtConfig().paperSettings.noTickViewDistance.enabled.get()) {
             noTickViewDistanceClamper = new ViewDistanceClamper(

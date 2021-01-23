@@ -11,7 +11,7 @@ import org.bukkit.World;
 import java.io.File;
 
 public class VdtConfig extends NabConfiguration {
-    public static final int VERSION = 3;
+    public static final int VERSION = 4;
 
     public VdtConfig(ViewDistanceTweaks viewDistanceTweaks) {
         super(
@@ -182,6 +182,9 @@ public class VdtConfig extends NabConfiguration {
         public final ConfigSectionMap<World, WorldSettings> worldSettings = new ConfigSectionMap<>(World::getName, WorldSettings.class, true);
 
         public static class WorldSettings extends ConfigSection {
+
+            @Entry(key = "exclude")
+            public final ConfigEntry<Boolean> exclude = new ConfigEntry<>();
 
             @Entry(key = "minimum-no-tick-view-distance")
             public final ConfigEntry<Integer> minimumNoTickViewDistance = new ConfigEntry<>();
