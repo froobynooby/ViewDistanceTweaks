@@ -90,7 +90,7 @@ public class VdtConfig extends NabConfiguration {
     public final ConfigEntry<Boolean> logViewDistanceChanges = new ConfigEntry<>();
 
     @SectionMap(key = "world-settings", defaultKey = "default")
-    public final ConfigSectionMap<World, WorldSettings> worldSettings = new ConfigSectionMap<>(World::getName, WorldSettings.class);
+    public final ConfigSectionMap<World, WorldSettings> worldSettings = new ConfigSectionMap<>(World::getName, WorldSettings.class, true);
 
     public static class WorldSettings extends ConfigSection {
 
@@ -179,7 +179,7 @@ public class VdtConfig extends NabConfiguration {
         }
 
         @SectionMap(key = "world-settings", defaultKey = "default")
-        public final ConfigSectionMap<World, WorldSettings> worldSettings = new ConfigSectionMap<>(World::getName, WorldSettings.class);
+        public final ConfigSectionMap<World, WorldSettings> worldSettings = new ConfigSectionMap<>(World::getName, WorldSettings.class, true);
 
         public static class WorldSettings extends ConfigSection {
 
