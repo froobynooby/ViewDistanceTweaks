@@ -5,7 +5,6 @@ import com.froobworld.viewdistancetweaks.config.VdtConfig;
 import com.froobworld.viewdistancetweaks.metrics.VdtMetrics;
 import com.froobworld.viewdistancetweaks.placeholder.VdtExpansion;
 import com.froobworld.viewdistancetweaks.util.*;
-import com.froobworld.viewdistancetweaks.metrics.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -73,7 +72,7 @@ public class ViewDistanceTweaks extends JavaPlugin {
     }
 
     private void initMetrics() {
-        VdtMetrics.addCustomMetrics(new Metrics(this, 6488), this);
+        new VdtMetrics(this);
     }
 
     public HookManager getHookManager() {
