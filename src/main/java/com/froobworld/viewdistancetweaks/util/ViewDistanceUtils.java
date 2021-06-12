@@ -30,8 +30,8 @@ public final class ViewDistanceUtils {
     private static int getProperViewDistance(World world) {
         int viewDistancePlusOne = on(world).call("getHandle")
                 .call("getChunkProvider")
-                .field("playerChunkMap")
-                .field("viewDistance").get();
+                .field(NmsUtils.getFieldOrMethodName("playerChunkMap", "a"))
+                .field(NmsUtils.getFieldOrMethodName("viewDistance", "J")).get();
         return viewDistancePlusOne - 1;
     }
 

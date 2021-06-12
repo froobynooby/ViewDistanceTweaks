@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 import static org.joor.Reflect.*;
 
 public class SpigotTickHook implements TickHook {
-    private static final Reflect currentTick = onClass(NmsUtils.getFullyQualifiedClassName("MinecraftServer")).field("currentTick");
+    private static final Reflect currentTick = onClass(NmsUtils.getFullyQualifiedClassName("MinecraftServer", "server")).field("currentTick");
 
     private final Set<Consumer<Integer>> tickStartCallbacks = new HashSet<>();
     private final Set<Consumer<Integer>> tickEndCallbacks = new HashSet<>();
