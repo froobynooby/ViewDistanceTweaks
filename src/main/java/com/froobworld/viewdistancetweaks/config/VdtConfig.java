@@ -11,7 +11,7 @@ import org.bukkit.World;
 import java.io.File;
 
 public class VdtConfig extends NabConfiguration {
-    public static final int VERSION = 4;
+    public static final int VERSION = 5;
 
     public VdtConfig(ViewDistanceTweaks viewDistanceTweaks) {
         super(
@@ -79,6 +79,9 @@ public class VdtConfig extends NabConfiguration {
 
     @Entry(key = "ticks-per-check")
     public final ConfigEntry<Long> ticksPerCheck = ConfigEntries.longEntry();
+
+    @Entry(key = "start-up-delay")
+    public final ConfigEntry<Long> startUpDelay = ConfigEntries.longEntry();
 
     @Entry(key = "passed-checks-for-increase")
     public final ConfigEntry<Integer> passedChecksForIncrease = new ConfigEntry<>();

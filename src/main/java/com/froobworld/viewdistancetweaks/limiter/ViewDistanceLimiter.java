@@ -58,11 +58,11 @@ public class ViewDistanceLimiter implements Runnable {
         changeViewDistanceTasks.removeIf(ViewDistanceChangeTask::completed);
     }
 
-    public void start(long period) {
+    public void start(long period, long startUpDelay) {
         if (taskId != null) {
             throw new IllegalStateException("Already started.");
         }
-        taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(viewDistanceTweaks, this, period, period);
+        taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(viewDistanceTweaks, this, startUpDelay + period, period);
     }
 
     public void cancel() {

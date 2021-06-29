@@ -146,7 +146,7 @@ public class TaskManager {
                 viewDistanceTweaks.getVdtConfig().logViewDistanceChanges.get(),
                 "Changed view distance of {0} ({1} -> {2})"
         );
-        limiterTask.start(viewDistanceTweaks.getVdtConfig().ticksPerCheck.get());
+        limiterTask.start(viewDistanceTweaks.getVdtConfig().ticksPerCheck.get(), viewDistanceTweaks.getVdtConfig().startUpDelay.get());
     }
 
     private void initNoTickLimiterTask() {
@@ -170,7 +170,7 @@ public class TaskManager {
                     viewDistanceTweaks.getVdtConfig().logViewDistanceChanges.get(),
                     "Changed no-tick view distance of {0} ({1} -> {2})"
             );
-            noTickLimiterTask.start(viewDistanceTweaks.getVdtConfig().ticksPerCheck.get());
+            noTickLimiterTask.start(viewDistanceTweaks.getVdtConfig().ticksPerCheck.get(), viewDistanceTweaks.getVdtConfig().startUpDelay.get());
         }
     }
 

@@ -3,7 +3,7 @@
 # Github: https://github.com/froobynooby/ViewDistanceTweaks
 
 # Please don't change this!
-version: 4
+version: 5
 
 # Set this to true to enable the plugin. The plugin is initially disabled so that you can make changes to the config
 # appropriate to your server.
@@ -63,6 +63,11 @@ reactive-mode-settings:
 
 # Every how many ticks should we check whether the view distance needs to be updated?
 ticks-per-check: 600
+
+# How long in ticks should we wait before starting the checking tasks following the plugin's start up?
+#  * This is useful when using the 'mixed' or 'reactive' adjustment modes where it is desirable to ignore the server's
+#    performance in the first few minutes following a restart.
+start-up-delay: 2400
 
 # How many checks in a row that say to increase the view distance should be required before the view distance is
 # actually increased?
