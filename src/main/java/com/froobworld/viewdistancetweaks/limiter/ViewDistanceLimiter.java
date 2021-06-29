@@ -37,7 +37,7 @@ public class ViewDistanceLimiter implements Runnable {
                     .filter(world -> !world.getPlayers().isEmpty())
                     .filter(world -> !manualViewDistanceManager.hasManuallySetViewDistance(world))
                     .collect(Collectors.toList());
-            Map<World, AdjustmentMode.Adjustment> adjustments = adjustmentMode.getAdjustments(nonEmptyWorlds);
+            Map<World, AdjustmentMode.Adjustment> adjustments = nonEmptyWorlds.isEmpty() ? Collections.emptyMap() : adjustmentMode.getAdjustments(nonEmptyWorlds);
 
             for (Map.Entry<World, AdjustmentMode.Adjustment> entry : adjustments.entrySet()) {
                 World world = entry.getKey();
