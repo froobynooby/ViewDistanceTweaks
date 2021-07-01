@@ -155,13 +155,6 @@ paper-settings:
       #  * Setting this too low will make the MSPT volatile.
       collection-period: 1200
 
-      # By how much (in percent) should we allow the tick durations we use to calculate the TPS vary from the average
-      # tick duration.
-      #  * This is used for smoothing the MSPT; making sure it's not heavily affected by sudden large lag spikes, such
-      #    as those caused by garbage collections or world-saves.
-      #  * Setting this to 0 will mean your MSPT will never change - don't do that.
-      trim-outliers-to-within: 100.0
-
     # We keep a history of MSPT vs. player-loaded chunk count in order to better predict what the MSPT will settle to
     # after increasing the view distance.
     mspt-prediction:
