@@ -65,8 +65,7 @@ public class TaskManager {
     private void initMsptTracker() {
         msptTracker = new MsptTracker(
                 viewDistanceTweaks.getVdtConfig().paperSettings.alternativeReactiveModeSettings.msptTracker.collectionPeriod.get(),
-                viewDistanceTweaks.getHookManager().getTickHook(),
-                viewDistanceTweaks.getVdtConfig().paperSettings.alternativeReactiveModeSettings.msptTracker.trimOutliersPercent.get()
+                viewDistanceTweaks.getHookManager().getTickHook()
         );
         msptTracker.register();
     }

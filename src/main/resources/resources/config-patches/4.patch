@@ -3,3 +3,10 @@ key=start-up-delay
 before=passed-checks-for-increase
 value=0
 comment=# How long in ticks should we wait before starting the checking tasks following the plugin's start up?\n#  * This is useful when using the 'mixed' or 'reactive' adjustment modes where it is desirable to ignore the server's\n#    performance in the first few minutes following a restart.
+
+[comment]
+key=paper-settings.alternative-reactive-mode-settings.mspt-tracker-settings.trim-outliers-to-within
+comment=# This setting is no longer used.
+
+[comment-out]
+key=paper-settings.alternative-reactive-mode-settings.mspt-tracker-settings.trim-outliers-to-within

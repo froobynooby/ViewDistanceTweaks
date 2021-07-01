@@ -164,9 +164,6 @@ public class VdtConfig extends NabConfiguration {
                 @Entry(key = "collection-period")
                 public final ConfigEntry<Integer> collectionPeriod = ConfigEntries.integerEntry();
 
-                @Entry(key = "trim-outliers-to-within")
-                public final ConfigEntry<Double> trimOutliersPercent= ConfigEntries.doubleEntry();
-
             }
 
             public static class MsptPredictionSettings extends ConfigSection {
