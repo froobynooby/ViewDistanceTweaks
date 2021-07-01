@@ -48,7 +48,7 @@ public class AlternativeReactiveAdjustmentMode extends BaseAdjustmentMode {
         for (World world : worlds) {
             if (mspt <= increaseMsptThreshold) {
                 int additionalChunks = (int) chunkCounter.countChunks(world, viewDistanceHook.getViewDistance(world) + 1) - chunkCounts.get(world);
-                if (useMsptChunkHistory && mspt + msptChunkHistory.getAverageMsptPerChunk() * (totalAdditionalChunks + additionalChunks) >= decreaseMsptThreshold) {
+                if (useMsptChunkHistory && mspt + msptChunkHistory.getMaximumMsptPerChunk() * (totalAdditionalChunks + additionalChunks) >= decreaseMsptThreshold) {
                     adjustments.put(world, tryStay(world));
                 } else {
                     Adjustment adjustment = tryIncrease(world);
@@ -76,12 +76,12 @@ public class AlternativeReactiveAdjustmentMode extends BaseAdjustmentMode {
         }
 
 
-        public double getAverageMsptPerChunk() {
-            double total = 0;
+        public double getMaximumMsptPerChunk() {
+            double max = 0;
             for (MsptChunkRecord record : records.values()) {
-                total += record.chunkCount > 0 ? (record.mspt / record.chunkCount) : 0;
+                max = Math.max(max, record.chunkCount > 0 ? (record.mspt / record.chunkCount) : 0);
             }
-            return records.size() > 0 ? (total / records.size()) : 0;
+            return max;
         }
 
         public void addRecord(double mspt, int chunkCount) {
