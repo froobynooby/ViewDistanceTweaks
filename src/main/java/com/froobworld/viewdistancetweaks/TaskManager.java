@@ -1,6 +1,7 @@
 package com.froobworld.viewdistancetweaks;
 
 import com.froobworld.viewdistancetweaks.hook.tick.PaperTickHook;
+import com.froobworld.viewdistancetweaks.hook.viewdistance.SimulationDistanceHook;
 import com.froobworld.viewdistancetweaks.hook.viewdistance.ViewDistanceHook;
 import com.froobworld.viewdistancetweaks.limiter.ManualViewDistanceManager;
 import com.froobworld.viewdistancetweaks.limiter.ViewDistanceClamper;
@@ -20,10 +21,10 @@ public class TaskManager {
     private MsptTracker msptTracker;
     private ViewDistanceLimiter limiterTask;
     private ViewDistanceLimiter noTickLimiterTask;
-    private ViewDistanceClamper viewDistanceClamper;
-    private ViewDistanceClamper noTickViewDistanceClamper;
+    private ViewDistanceClamper simulationDistanceClamper;
+    private ViewDistanceClamper ViewDistanceClamper;
+    private ManualViewDistanceManager manualSimulationDistanceManager;
     private ManualViewDistanceManager manualViewDistanceManager;
-    private ManualViewDistanceManager manualNoTickViewDistanceManager;
 
     public TaskManager(ViewDistanceTweaks viewDistanceTweaks) {
         this.viewDistanceTweaks = viewDistanceTweaks;
@@ -46,9 +47,9 @@ public class TaskManager {
         if (noTickLimiterTask != null) {
             noTickLimiterTask.cancel();
         }
-        manualViewDistanceManager.cancel();
-        if (manualNoTickViewDistanceManager != null) {
-            manualNoTickViewDistanceManager.cancel();
+        manualSimulationDistanceManager.cancel();
+        if (manualViewDistanceManager != null) {
+            manualViewDistanceManager.cancel();
         }
         init();
     }
@@ -71,13 +72,13 @@ public class TaskManager {
     }
 
     private void initManualViewDistanceManagers() {
-        manualViewDistanceManager = new ManualViewDistanceManager(
+        manualSimulationDistanceManager = new ManualViewDistanceManager(
                 viewDistanceTweaks,
-                viewDistanceTweaks.getHookManager().getViewDistanceHook()
+                viewDistanceTweaks.getHookManager().getSimulationDistanceHook()
         );
-        ViewDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook();
+        SimulationDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getViewDistanceHook();
         if (noTickViewDistanceHook != null) {
-            manualNoTickViewDistanceManager = new ManualViewDistanceManager(
+            manualViewDistanceManager = new ManualViewDistanceManager(
                     viewDistanceTweaks,
                     noTickViewDistanceHook
             );
@@ -97,10 +98,10 @@ public class TaskManager {
                         viewDistanceTweaks.getVdtConfig().paperSettings.alternativeReactiveModeSettings.decreaseMsptThreshold.get(),
                         viewDistanceTweaks.getVdtConfig().paperSettings.alternativeReactiveModeSettings.msptPrediction.historyLength.get(),
                         viewDistanceTweaks.getVdtConfig().paperSettings.alternativeReactiveModeSettings.msptPrediction.enabled.get(),
-                        viewDistanceTweaks.getHookManager().getViewDistanceHook(),
-                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).exclude.get(),
-                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).maximumViewDistance.get(),
-                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).minimumViewDistance.get(),
+                        viewDistanceTweaks.getHookManager().getSimulationDistanceHook(),
+                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.exclude.get(),
+                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.maximumSimulationDistance.get(),
+                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.minimumSimulationDistance.get(),
                         viewDistanceTweaks.getVdtConfig().passedChecksForIncrease.get(),
                         viewDistanceTweaks.getVdtConfig().passedChecksForDecrease.get()
                 );
@@ -112,10 +113,10 @@ public class TaskManager {
                         viewDistanceTweaks.getVdtConfig().reactiveMode.decreaseTpsThreshold.get(),
                         viewDistanceTweaks.getVdtConfig().reactiveMode.tpsPrediction.historyLength.get(),
                         viewDistanceTweaks.getVdtConfig().reactiveMode.tpsPrediction.enabled.get(),
-                        viewDistanceTweaks.getHookManager().getViewDistanceHook(),
-                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).exclude.get(),
-                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).maximumViewDistance.get(),
-                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).minimumViewDistance.get(),
+                        viewDistanceTweaks.getHookManager().getSimulationDistanceHook(),
+                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.exclude.get(),
+                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.maximumSimulationDistance.get(),
+                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.minimumSimulationDistance.get(),
                         viewDistanceTweaks.getVdtConfig().passedChecksForIncrease.get(),
                         viewDistanceTweaks.getVdtConfig().passedChecksForDecrease.get()
                 );
@@ -123,12 +124,12 @@ public class TaskManager {
         }
         if (mode == AdjustmentMode.Mode.PROACTIVE || mode == AdjustmentMode.Mode.MIXED) {
             proactiveAdjustmentMode = new ProactiveAdjustmentMode(
-                    viewDistanceTweaks.getVdtConfig().proactiveMode.globalChunkCountTarget.get(),
-                    viewDistanceTweaks.getHookManager().getViewDistanceHook(),
+                    viewDistanceTweaks.getVdtConfig().proactiveMode.globalTickingChunkCountTarget.get(),
+                    viewDistanceTweaks.getHookManager().getSimulationDistanceHook(),
                     viewDistanceTweaks.getHookManager().getChunkCounter(),
-                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).exclude.get(),
-                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).maximumViewDistance.get(),
-                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).minimumViewDistance.get(),
+                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.exclude.get(),
+                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.maximumSimulationDistance.get(),
+                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.minimumSimulationDistance.get(),
                     viewDistanceTweaks.getVdtConfig().passedChecksForIncrease.get(),
                     viewDistanceTweaks.getVdtConfig().passedChecksForDecrease.get()
             );
@@ -139,25 +140,25 @@ public class TaskManager {
 
         limiterTask = new ViewDistanceLimiter(
                 viewDistanceTweaks,
-                viewDistanceTweaks.getHookManager().getViewDistanceHook(),
+                viewDistanceTweaks.getHookManager().getSimulationDistanceHook(),
                 adjustmentMode,
-                manualViewDistanceManager,
-                viewDistanceTweaks.getVdtConfig().logViewDistanceChanges.get(),
-                "Changed view distance of {0} ({1} -> {2})"
+                manualSimulationDistanceManager,
+                viewDistanceTweaks.getVdtConfig().logChanges.get(),
+                "Changed simulation distance of {0} ({1} -> {2})"
         );
         limiterTask.start(viewDistanceTweaks.getVdtConfig().ticksPerCheck.get(), viewDistanceTweaks.getVdtConfig().startUpDelay.get());
     }
 
     private void initNoTickLimiterTask() {
-        ViewDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook();
-        if (viewDistanceTweaks.getVdtConfig().paperSettings.noTickViewDistance.enabled.get() && noTickViewDistanceHook != null) {
+        SimulationDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getViewDistanceHook();
+        if (noTickViewDistanceHook != null) {
             AdjustmentMode noTickAdjustmentMode = new ProactiveAdjustmentMode(
-                    viewDistanceTweaks.getVdtConfig().paperSettings.noTickViewDistance.globalChunkCountTarget.get(),
+                    viewDistanceTweaks.getVdtConfig().proactiveMode.globalNonTickingChunkCountTarget.get(),
                     noTickViewDistanceHook,
                     viewDistanceTweaks.getHookManager().getNoTickChunkCounter(),
-                    world -> viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).exclude.get(),
-                    world -> viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).maximumNoTickViewDistance.get(),
-                    world -> viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).minimumNoTickViewDistance.get(),
+                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.exclude.get(),
+                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.maximumViewDistance.get(),
+                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.minimumViewDistance.get(),
                     viewDistanceTweaks.getVdtConfig().passedChecksForIncrease.get(),
                     viewDistanceTweaks.getVdtConfig().passedChecksForDecrease.get()
             );
@@ -165,37 +166,37 @@ public class TaskManager {
                     viewDistanceTweaks,
                     noTickViewDistanceHook,
                     noTickAdjustmentMode,
-                    manualNoTickViewDistanceManager,
-                    viewDistanceTweaks.getVdtConfig().logViewDistanceChanges.get(),
-                    "Changed no-tick view distance of {0} ({1} -> {2})"
+                    manualViewDistanceManager,
+                    viewDistanceTweaks.getVdtConfig().logChanges.get(),
+                    "Changed view distance of {0} ({1} -> {2})"
             );
             noTickLimiterTask.start(viewDistanceTweaks.getVdtConfig().ticksPerCheck.get(), viewDistanceTweaks.getVdtConfig().startUpDelay.get());
         }
     }
 
     private void initViewDistanceClampers() {
-        viewDistanceClamper = new ViewDistanceClamper(
-                viewDistanceTweaks.getHookManager().getViewDistanceHook(),
-                world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).maximumViewDistance.get(),
-                world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).minimumViewDistance.get()
+        simulationDistanceClamper = new ViewDistanceClamper(
+                viewDistanceTweaks.getHookManager().getSimulationDistanceHook(),
+                world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.maximumSimulationDistance.get(),
+                world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.minimumSimulationDistance.get()
         );
 
         List<World> worldsToClamp = Bukkit.getWorlds().stream()
-                .filter(world -> !viewDistanceTweaks.getVdtConfig().worldSettings.of(world).exclude.get())
+                .filter(world -> !viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.exclude.get())
                 .collect(Collectors.toList());
-        viewDistanceClamper.clampWorlds(worldsToClamp);
+        simulationDistanceClamper.clampWorlds(worldsToClamp);
 
         worldsToClamp = Bukkit.getWorlds().stream()
-                .filter(world -> !viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).exclude.get())
+                .filter(world -> !viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.exclude.get())
                 .collect(Collectors.toList());
-        ViewDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook();
-        if (noTickViewDistanceHook != null && viewDistanceTweaks.getVdtConfig().paperSettings.noTickViewDistance.enabled.get()) {
-            noTickViewDistanceClamper = new ViewDistanceClamper(
-                    noTickViewDistanceHook,
-                    world -> viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).maximumNoTickViewDistance.get(),
-                    world -> viewDistanceTweaks.getVdtConfig().paperSettings.worldSettings.of(world).minimumNoTickViewDistance.get()
+        ViewDistanceHook viewDistanceHook = viewDistanceTweaks.getHookManager().getViewDistanceHook();
+        if (viewDistanceHook != null) {
+            ViewDistanceClamper = new ViewDistanceClamper(
+                    viewDistanceHook,
+                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.maximumViewDistance.get(),
+                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.minimumViewDistance.get()
             );
-            noTickViewDistanceClamper.clampWorlds(worldsToClamp);
+            ViewDistanceClamper.clampWorlds(worldsToClamp);
         }
     }
 
@@ -207,12 +208,12 @@ public class TaskManager {
         return msptTracker;
     }
 
-    public ManualViewDistanceManager getManualViewDistanceManager() {
-        return manualViewDistanceManager;
+    public ManualViewDistanceManager getManualSimulationDistanceManager() {
+        return manualSimulationDistanceManager;
     }
 
-    public ManualViewDistanceManager getManualNoTickViewDistanceManager() {
-        return manualNoTickViewDistanceManager;
+    public ManualViewDistanceManager getManualViewDistanceManager() {
+        return manualViewDistanceManager;
     }
 
 }

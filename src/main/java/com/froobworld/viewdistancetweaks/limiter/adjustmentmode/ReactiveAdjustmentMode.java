@@ -1,6 +1,6 @@
 package com.froobworld.viewdistancetweaks.limiter.adjustmentmode;
 
-import com.froobworld.viewdistancetweaks.hook.viewdistance.ViewDistanceHook;
+import com.froobworld.viewdistancetweaks.hook.viewdistance.SimulationDistanceHook;
 import com.froobworld.viewdistancetweaks.util.ChunkCounter;
 import com.froobworld.viewdistancetweaks.util.TpsTracker;
 import org.bukkit.World;
@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 public class ReactiveAdjustmentMode extends BaseAdjustmentMode {
     private final TpsChunkHistory tpsChunkHistory;
-    private final ViewDistanceHook viewDistanceHook;
+    private final SimulationDistanceHook simulationDistanceHook;
     private final TpsTracker tpsTracker;
     private final ChunkCounter chunkCounter;
     private final double increaseTpsThreshold;
@@ -21,11 +21,11 @@ public class ReactiveAdjustmentMode extends BaseAdjustmentMode {
     private final boolean useTpsChunkHistory;
 
     public ReactiveAdjustmentMode(TpsTracker tpsTracker, ChunkCounter chunkCounter, double increaseTpsThreshold, double decreaseTpsThreshold, long tpsChunkHistoryLength,
-                                  boolean useTpsChunkHistory, ViewDistanceHook viewDistanceHook, Function<World, Boolean> exclude, Function<World, Integer> maxViewDistance,
+                                  boolean useTpsChunkHistory, SimulationDistanceHook simulationDistanceHook, Function<World, Boolean> exclude, Function<World, Integer> maxViewDistance,
                                   Function<World, Integer> minViewDistance, int requiredIncrease, int requiredDecrease) {
-        super(viewDistanceHook, exclude, maxViewDistance, minViewDistance, requiredIncrease, requiredDecrease);
+        super(simulationDistanceHook, exclude, maxViewDistance, minViewDistance, requiredIncrease, requiredDecrease);
         this.tpsTracker = tpsTracker;
-        this.viewDistanceHook = viewDistanceHook;
+        this.simulationDistanceHook = simulationDistanceHook;
         this.chunkCounter = chunkCounter;
         this.increaseTpsThreshold = increaseTpsThreshold;
         this.decreaseTpsThreshold = decreaseTpsThreshold;
@@ -38,7 +38,7 @@ public class ReactiveAdjustmentMode extends BaseAdjustmentMode {
         Map<World, Integer> chunkCounts = new HashMap<>();
         int totalCount = 0;
         for (World world : worlds) {
-            totalCount += chunkCounts.computeIfAbsent(world, w -> (int) chunkCounter.countChunks(w, viewDistanceHook.getViewDistance(world)));
+            totalCount += chunkCounts.computeIfAbsent(world, w -> (int) chunkCounter.countChunks(w, simulationDistanceHook.getDistance(world)));
         }
 
         double tps = tpsTracker.getTps();
@@ -53,7 +53,7 @@ public class ReactiveAdjustmentMode extends BaseAdjustmentMode {
                     adjustments.put(world, adjustment);
                     if (adjustment == Adjustment.INCREASE) {
                         int oldChunkCount = chunkCounts.get(world);
-                        int newChunkCount = (int) chunkCounter.countChunks(world, viewDistanceHook.getViewDistance(world) + 1);
+                        int newChunkCount = (int) chunkCounter.countChunks(world, simulationDistanceHook.getDistance(world) + 1);
                         totalCount += newChunkCount - oldChunkCount;
                     }
                 }
@@ -62,7 +62,7 @@ public class ReactiveAdjustmentMode extends BaseAdjustmentMode {
                 adjustments.put(world, adjustment);
                 if (adjustment == Adjustment.DECREASE) {
                     int oldChunkCount = chunkCounts.get(world);
-                    int newChunkCount = (int) chunkCounter.countChunks(world, viewDistanceHook.getViewDistance(world) - 1);
+                    int newChunkCount = (int) chunkCounter.countChunks(world, simulationDistanceHook.getDistance(world) - 1);
                     totalCount += newChunkCount - oldChunkCount;
                 }
             } else {

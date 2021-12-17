@@ -3,33 +3,42 @@
 # Github: https://github.com/froobynooby/ViewDistanceTweaks
 
 # Please don't change this!
-version: 5
+version: 6
 
 # Set this to true to enable the plugin. The plugin is initially disabled so that you can make changes to the config
 # appropriate to your server.
 enabled: false
 
-# How should we determine whether the view distance needs adjusting? Accepts three values:
-#  * proactive : Adjust the view distance so that the player-loaded chunk count is always below a set threshold.
-#  * reactive  : Adjust the view distance in response to changes in the server's TPS.
-#  * mixed     : Be both proactive and reactive; prioritising decreasing the view distance over increasing.
+# How should we determine whether the simulation distance needs adjusting? Accepts three values:
+#  * proactive : Adjust the simulation distance so that the player-loaded chunk count is always below a set threshold.
+#  * reactive  : Adjust the simulation distance in response to changes in the server's TPS.
+#  * mixed     : Be both proactive and reactive; prioritising decreasing the simulation distance over increasing.
 adjustment-mode: mixed
 
 # These settings are for the proactive adjustment mode.
 proactive-mode-settings:
-  # Set this to the maximum chunk count your server can handle. The view distance of each world will be adjusted such
-  # that the total number of player-loaded chunks is sitting as close to this value as possible.
-  #  * If you know your server can handle up to p many players with a view distance of d, a reasonable choice is to set
-  #    this to (2d + 1)^2 * p.
-  #  * As an example, 5780 is the number of player-loaded chunks for 20 players with a view distance of 8.
-  global-chunk-count-target: 5780
+  # Set this to the maximum chunk count your server can handle. The simulation distance of each world will be adjusted
+  # such that the total number of player-loaded chunks is sitting as close to this value as possible.
+  #  * If you know your server can handle up to p many players with a simulation distance of d, a reasonable choice is
+  #    to set this to (2d + 1)^2 * p.
+  #  * As an example, 5780 is the number of player-loaded chunks for 20 players with a simulation distance of 8.
+  global-ticking-chunk-count-target: 5780
+
+  # Set this to the maximum number of chunks you want to be loaded by the view distance.
+  #  * Note: this only counts chunks that are outside of the simulation distance of a player, but within the view
+  #    view distance of a player.
+  #  * If you know your server can handle up to p many players with a view distance of v and a simulation distance of s,
+  #    a reasonable choice is to set this to ((2v + 1)^2 - (2s + 1)^2) * p.
+  #  * As an example, 6720 is the number of chunks loaded by the view distance for 20 players with a view distance of 12
+  #    and a simulation distance of 8.
+  global-non-ticking-chunk-count-target: 6720
 
 # These settings are for the reactive adjustment mode.
 reactive-mode-settings:
-  # Above what TPS should we consider increasing the view distance?
+  # Above what TPS should we consider increasing the simulation distance?
   increase-tps-threshold: 19.9
 
-  # Below what TPS should we consider decreasing the view distance?
+  # Below what TPS should we consider decreasing the simulation distance?
   decrease-tps-threshold: 18.0
 
   # These settings concern how we determine the TPS.
@@ -48,20 +57,20 @@ reactive-mode-settings:
     trim-outliers-to-within: 100.0
 
   # We keep a history of TPS vs. player-loaded chunk count in order to better predict what the TPS will settle to after
-  # increasing the view distance.
+  # increasing the simulation distance.
   tps-prediction:
-    # Should we use TPS prediction when we are considering increasing the view distance?
-    #  * For example, we may be at 20 TPS with a view distance of 6, meaning we would consider increasing the view
-    #    distance to 7. However, if we saw that 10 minutes ago with a view distance of 7 we had 17 TPS, we would hold
-    #    off on increasing.
-    #  * Disabling this can lead to a back-and-forth game of increasing and decreasing the view distance every few
+    # Should we use TPS prediction when we are considering increasing the simulation distance?
+    #  * For example, we may be at 20 TPS with a simulation distance of 6, meaning we would consider increasing the
+    #    simulation distance to 7. However, if we saw that 10 minutes ago with a simulation distance of 7 we had 17 TPS,
+    #    we would hold off on increasing.
+    #  * Disabling this can lead to a back-and-forth game of increasing and decreasing the simulation distance every few
     #    minutes - not ideal.
     enabled: true
 
     # For how long (in minutes) should we keep a TPS / chunk count history?
     history-length: 30
 
-# Every how many ticks should we check whether the view distance needs to be updated?
+# Every how many ticks should we check whether the simulation distance needs to be updated?
 ticks-per-check: 600
 
 # How long in ticks should we wait before starting the checking tasks following the plugin's start up?
@@ -69,35 +78,50 @@ ticks-per-check: 600
 #    performance in the first few minutes following a restart.
 start-up-delay: 2400
 
-# How many checks in a row that say to increase the view distance should be required before the view distance is
-# actually increased?
-#  * This is useful as it guards against the following kind of case: A player leaves and the view distance is increased,
-#    but the player returns three minutes later and the view distance is lowered to its previous value.
-#  * Since increasing the view distance can cause lag-spikes for players with poorer connections, it is recommended to
-#    keep this value relatively high.
+# How many checks in a row that say to increase the simulation distance should be required before the simulation or view
+# distance is actually increased?
+#  * This is useful as it guards against the following kind of case: A player leaves and the view distance is
+#    increased, but the player returns three minutes later and the view distance is lowered to its previous value.
+#  * Since increasing the view distance can cause lag-spikes for players with poorer connections, it is
+#    recommended to keep this value relatively high.
 passed-checks-for-increase: 10
 
-# How many checks in a row that say to decrease the view distance should be required before the view distance is
-# actually decreased?
+# How many checks in a row that say to decrease the simulation distance should be required before the simulation or view
+# distance is actually decreased?
 passed-checks-for-decrease: 1
 
-# Should we send a message to the console when we change the view distance?
-log-view-distance-changes: false
+# Should we send a message to the console when we change the simulation or view distance?
+log-changes: false
 
 # These settings can be specified per world. If a world is not specified or if a setting is missing, it will use the
 # settings listed under the default section.
 world-settings:
   default:
-    # Should we not manage the view distance in this world?
-    #  * Note: Even if excluded, the world's chunks will be counted for the purpose of adjusting the view distance of
-    #    other worlds. If you do not want this, also be sure to set the chunk-weight to 0.
-    exclude: false
+    # These settings concern the simulation distance of this world.
+    simulation-distance:
+      # Should we not manage the simulation distance in this world?
+      #  * Note: Even if excluded, the world's chunks will be counted for the purpose of adjusting the simulation distance
+      #    of other worlds. If you do not want this, also be sure to set the chunk-weight to 0.
+      exclude: false
 
-    # What should the absolute minimum view distance be in this world?
-    minimum-view-distance: 6
+      # What should the absolute minimum simulation distance be in this world?
+      minimum-simulation-distance: 6
 
-    # What should the absolute maximum view distance be in this world?
-    maximum-view-distance: 12
+      # What should the absolute maximum simulation distance be in this world?
+      maximum-simulation-distance: 12
+
+    # These settings concern the view distance of this world.
+    view-distance:
+      # Should we not manage the view distance in this world?
+      #  * Note: Even if excluded, the world's chunks will be counted for the purpose of adjusting the view distances
+      #    of other worlds.
+      exclude: false
+
+      # What should the absolute minimum view distance be in this world?
+      minimum-view-distance: 8
+
+      # What should the absolute maximum view distance be in this world?
+      maximum-view-distance: 16
 
     # Relative to the other worlds, how 'heavy' is a chunk on performance?
     #  * For example: In the End dimension, about half of the chunks you encounter are void and so have very little
@@ -106,45 +130,30 @@ world-settings:
 
     # These settings concern how we count the number of chunks in this world.
     chunk-counter-settings:
-      # When two players are near each other, their view distances can overlap. Should we not double count the chunks
-      # that are overlapping?
+      # When two players are near each other, their simulation distances can overlap. Should we not double count the
+      # chunks that are overlapping?
       exclude-overlap: true
 
 #  world_the_end:
-#    minimum-view-distance: 8
-#    maximum-view-distance: 10
+#    simulation-distance:
+#      minimum-simulation-distance: 8
+#      maximum-simulation-distance: 10
 #    chunk-weight: 0.5
 
 # These are additional settings that apply if you are using Paper as your server software.
 paper-settings:
-  # These settings concern the no-tick view distance available in Paper 1.15.2+.
-  #  * Note: higher no-tick view distances are less heavy on the server as far as TPS goes. For this reason, there is no
-  #    option to adjust no-tick view distance based on TPS.
-  no-tick-view-distance:
-    # Should we adjust the no-tick view distance?
-    enabled: true
-
-    # Set this to the maximum number of chunks you want to be loaded by the no-tick view distance.
-    #  * Note: this only counts chunks that are outside of the standard view distance of a player, but within the
-    #    no-tick view distance of a player.
-    #  * If you know your server can handle up to p many players with a no-tick view distance of n and a standard view
-    #    distance of d, a reasonable choice is to set this to ((2n + 1)^2 - (2d + 1)^2) * p.
-    #  * As an example, 6720 is the number of chunks loaded by the no-tick view distance for 20 players with a no-tick
-    #    view distance of 12, and a standard view distance of 8.
-    global-chunk-count-target: 6720
-
-  # These settings are an alternative option to the reactive-mode-settings, allowing view distance to be adjusted based
-  # on MSPT rather than TPS.
+  # These settings are an alternative option to the reactive-mode-settings, allowing simulation distance to be adjusted
+  # based on MSPT rather than TPS.
   #  * MSPT stands for "milliseconds per tick", and tells you how long your server takes to tick on average. A server
   #    whose MSPT is above 50 will notice things slowing down, as the TPS drops.
   alternative-reactive-mode-settings:
     # Should we use these alternative settings for reactive mode?
     use-alternative-settings: false
 
-    # Below what MSPT should we considering increasing the view distance?
+    # Below what MSPT should we considering increasing the simulation distance?
     increase-mspt-threshold: 40.0
 
-    # Above what MSPT should we consider decreasing the view distance?
+    # Above what MSPT should we consider decreasing the simulation distance?
     decrease-mspt-threshold: 47.0
 
     # These settings concern how we determine the server's MSPT.
@@ -156,28 +165,15 @@ paper-settings:
       collection-period: 1200
 
     # We keep a history of MSPT vs. player-loaded chunk count in order to better predict what the MSPT will settle to
-    # after increasing the view distance.
+    # after increasing the simulation distance.
     mspt-prediction:
-      # Should we use MSPT prediction when we are considering increasing the view distance?
-      #  * For example, we may be at 38 MSPT with a view distance of 6, meaning we would consider increasing the view
-      #    distance to 7. However, if we saw that 10 minutes ago with a view distance of 7 we had 48 MSPT, we would hold
-      #    off on increasing.
-      #  * Disabling this can lead to a back-and-forth game of increasing and decreasing the view distance every few
-      #    minutes - not ideal.
+      # Should we use MSPT prediction when we are considering increasing the simulation distance?
+      #  * For example, we may be at 38 MSPT with a simulation distance of 6, meaning we would consider increasing the
+      #    simulation distance to 7. However, if we saw that 10 minutes ago with a simulation distance of 7 we had
+      #    48 MSPT, we would hold off on increasing.
+      #  * Disabling this can lead to a back-and-forth game of increasing and decreasing the simulation distance every
+      #    few minutes - not ideal.
       enabled: true
 
       # For how long (in minutes) should we keep a MSPT / chunk count history?
       history-length: 30
-
-  world-settings:
-    default:
-      # Should we not manage the no-tick view distance in this world?
-      #  * Note: Even if excluded, the world's chunks will be counted for the purpose of adjusting the no-tick view
-      #    distance of other worlds.
-      exclude: false
-
-      # What should the absolute minimum no-tick view distance be in this world?
-      minimum-no-tick-view-distance: 8
-
-      # What should the absolute maximum no-tick view distance be in this world?
-      maximum-no-tick-view-distance: 16

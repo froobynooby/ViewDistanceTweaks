@@ -37,14 +37,26 @@ permissions:
     children:
       viewdistancetweaks.command.vdt: true
 
-  viewdistancetweaks.vdt.command.set:
+  viewdistancetweaks.vdt.command.simulationdistance:
     default: op
-    description: Access the /vdt set command.
+    description: Access the /vdt simulationdistance command.
     children:
       viewdistancetweaks.command.vdt: true
 
-  viewdistancetweaks.vdt.command.set-no-tick:
+  viewdistancetweaks.vdt.command.set:
+    default: op
+    description: Legacy permission for /vdt simulationdistance command.
+    children:
+      viewdistancetweaks.command.simulationdistance: true
+
+  viewdistancetweaks.vdt.command.viewdistance:
     default: op
     description: Access the /vdt set-no-tick command.
     children:
       viewdistancetweaks.command.vdt: true
+
+  viewdistancetweaks.vdt.command.set-no-tick:
+    default: false
+    description: Legacy permission for /vdt viewdistance command.
+    children:
+      viewdistancetweaks.command.viewdistance: true

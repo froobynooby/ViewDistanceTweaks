@@ -3,11 +3,7 @@ package com.froobworld.viewdistancetweaks;
 import com.froobworld.viewdistancetweaks.hook.tick.PaperTickHook;
 import com.froobworld.viewdistancetweaks.hook.tick.SpigotTickHook;
 import com.froobworld.viewdistancetweaks.hook.tick.TickHook;
-import com.froobworld.viewdistancetweaks.hook.viewdistance.PaperViewDistanceHook;
-import com.froobworld.viewdistancetweaks.hook.viewdistance.SpigotViewDistanceHook;
-import com.froobworld.viewdistancetweaks.hook.viewdistance.ViewDistanceHook;
-import com.froobworld.viewdistancetweaks.hook.viewdistance.notick.NoTickViewDistanceHook;
-import com.froobworld.viewdistancetweaks.hook.viewdistance.notick.PaperNoTickViewDistanceHook;
+import com.froobworld.viewdistancetweaks.hook.viewdistance.*;
 import com.froobworld.viewdistancetweaks.util.ChunkCounter;
 import com.froobworld.viewdistancetweaks.util.NoTickChunkCounter;
 import com.froobworld.viewdistancetweaks.util.PreferenceChooser;
@@ -16,8 +12,8 @@ import com.froobworld.viewdistancetweaks.util.StandardChunkCounter;
 public class HookManager {
     private final ViewDistanceTweaks viewDistanceTweaks;
     private TickHook tickHook;
+    private SimulationDistanceHook simulationDistanceHook;
     private ViewDistanceHook viewDistanceHook;
-    private NoTickViewDistanceHook noTickViewDistanceHook;
     private ChunkCounter chunkCounter;
     private ChunkCounter noTickChunkCounter;
     private ChunkCounter actualChunkCounter;
@@ -32,12 +28,12 @@ public class HookManager {
         return tickHook;
     }
 
-    public ViewDistanceHook getViewDistanceHook() {
-        return viewDistanceHook;
+    public SimulationDistanceHook getSimulationDistanceHook() {
+        return simulationDistanceHook;
     }
 
-    public NoTickViewDistanceHook getNoTickViewDistanceHook() {
-        return noTickViewDistanceHook;
+    public ViewDistanceHook getViewDistanceHook() {
+        return viewDistanceHook;
     }
 
     public ChunkCounter getChunkCounter() {
@@ -57,17 +53,22 @@ public class HookManager {
     }
 
     public void init() {
+        simulationDistanceHook = PreferenceChooser
+                .bestChoice(PaperSimulationDistanceHook::new, PaperSimulationDistanceHook::isCompatible)
+                .nextBestChoice(SpigotSimulationDistanceHook::new, SpigotSimulationDistanceHook::isCompatible)
+                .get();
+        if (simulationDistanceHook == null) {
+            throw new IllegalStateException("No simulation distance hook is available. Incompatible version?");
+        }
+        viewDistanceTweaks.getLogger().info("Using " + simulationDistanceHook.getClass().getSimpleName() + " for the simulation distance hook.");
+
         viewDistanceHook = PreferenceChooser
                 .bestChoice(PaperViewDistanceHook::new, PaperViewDistanceHook::isCompatible)
-                .defaultChoice(SpigotViewDistanceHook::new);
-        viewDistanceTweaks.getLogger().info("Using " + viewDistanceHook.getClass().getSimpleName() + " for the view distance hook.");
-
-        noTickViewDistanceHook = PreferenceChooser
-                .bestChoice(PaperNoTickViewDistanceHook::new, PaperNoTickViewDistanceHook::isCompatible)
+                .nextBestChoice(() -> new SpigotViewDistanceHook(viewDistanceTweaks.getClientViewDistanceManager()), SpigotViewDistanceHook::isCompatible)
                 .get();
-        viewDistanceTweaks.getLogger().info(noTickViewDistanceHook != null ?
-                "Using " + noTickViewDistanceHook.getClass().getSimpleName() + " for the no-tick view distance hook." :
-                "No hook available for no-tick view distance.");
+        viewDistanceTweaks.getLogger().info(viewDistanceHook != null ?
+                "Using " + viewDistanceHook.getClass().getSimpleName() + " for the view distance hook." :
+                "No hook available for view distance.");
 
         tickHook = PreferenceChooser
                 .bestChoice(PaperTickHook::new, PaperTickHook::isCompatible)
@@ -80,7 +81,7 @@ public class HookManager {
                 world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).chunkCounter.excludeOverlap.get()
         );
         noTickChunkCounter = new NoTickChunkCounter(
-                viewDistanceHook,
+                simulationDistanceHook,
                 world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).chunkWeight.get(),
                 world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).chunkCounter.excludeOverlap.get()
         );
@@ -89,7 +90,7 @@ public class HookManager {
                 world -> true
         );
         actualNoTickChunkCounter = new NoTickChunkCounter(
-                viewDistanceHook,
+                simulationDistanceHook,
                 world -> 1.0,
                 world -> true
         );

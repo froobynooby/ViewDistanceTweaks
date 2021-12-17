@@ -11,7 +11,7 @@ import org.bukkit.World;
 import java.io.File;
 
 public class VdtConfig extends NabConfiguration {
-    public static final int VERSION = 5;
+    public static final int VERSION = 6;
 
     public VdtConfig(ViewDistanceTweaks viewDistanceTweaks) {
         super(
@@ -33,9 +33,11 @@ public class VdtConfig extends NabConfiguration {
 
     public static class ProactiveModeSettings extends ConfigSection {
 
-        @Entry(key = "global-chunk-count-target")
-        public final ConfigEntry<Integer> globalChunkCountTarget = ConfigEntries.integerEntry();
+        @Entry(key = "global-ticking-chunk-count-target")
+        public final ConfigEntry<Integer> globalTickingChunkCountTarget = ConfigEntries.integerEntry();
 
+        @Entry(key = "global-non-ticking-chunk-count-target")
+        public final ConfigEntry<Integer> globalNonTickingChunkCountTarget = new ConfigEntry<>();
     }
 
     @Section(key = "reactive-mode-settings")
@@ -89,28 +91,51 @@ public class VdtConfig extends NabConfiguration {
     @Entry(key = "passed-checks-for-decrease")
     public final ConfigEntry<Integer> passedChecksForDecrease = new ConfigEntry<>();
 
-    @Entry(key = "log-view-distance-changes")
-    public final ConfigEntry<Boolean> logViewDistanceChanges = new ConfigEntry<>();
+    @Entry(key = "log-changes")
+    public final ConfigEntry<Boolean> logChanges = new ConfigEntry<>();
 
     @SectionMap(key = "world-settings", defaultKey = "default")
     public final ConfigSectionMap<World, WorldSettings> worldSettings = new ConfigSectionMap<>(World::getName, WorldSettings.class, true);
 
     public static class WorldSettings extends ConfigSection {
 
-        @Entry(key = "exclude")
-        public final ConfigEntry<Boolean> exclude = new ConfigEntry<>();
+        @Section(key = "simulation-distance")
+        public final SimulationDistanceSettings simulationDistance = new SimulationDistanceSettings();
 
-        @Entry(key = "minimum-view-distance")
-        public final ConfigEntry<Integer> minimumViewDistance = new ConfigEntry<>();
-
-        @Entry(key = "maximum-view-distance")
-        public final ConfigEntry<Integer> maximumViewDistance = new ConfigEntry<>();
+        @Section(key = "view-distance")
+        public final ViewDistanceSettings viewDistance = new ViewDistanceSettings();
 
         @Section(key = "chunk-counter-settings")
         public final ChunkCounterSettings chunkCounter = new ChunkCounterSettings();
 
         @Entry(key = "chunk-weight")
         public final ConfigEntry<Double> chunkWeight = ConfigEntries.doubleEntry();
+
+        public static class SimulationDistanceSettings extends ConfigSection {
+
+            @Entry(key = "exclude")
+            public final ConfigEntry<Boolean> exclude = new ConfigEntry<>();
+
+            @Entry(key = "minimum-simulation-distance")
+            public final ConfigEntry<Integer> minimumSimulationDistance = new ConfigEntry<>();
+
+            @Entry(key = "maximum-simulation-distance")
+            public final ConfigEntry<Integer> maximumSimulationDistance = new ConfigEntry<>();
+
+        }
+
+        public static class ViewDistanceSettings extends ConfigSection {
+
+            @Entry(key = "exclude")
+            public final ConfigEntry<Boolean> exclude = new ConfigEntry<>();
+
+            @Entry(key = "minimum-view-distance")
+            public final ConfigEntry<Integer> minimumViewDistance = new ConfigEntry<>();
+
+            @Entry(key = "maximum-view-distance")
+            public final ConfigEntry<Integer> maximumViewDistance = new ConfigEntry<>();
+
+        }
 
         public static class ChunkCounterSettings extends ConfigSection {
 
@@ -125,19 +150,6 @@ public class VdtConfig extends NabConfiguration {
     public final PaperSettings paperSettings = new PaperSettings();
 
     public static class PaperSettings extends ConfigSection {
-
-        @Section(key = "no-tick-view-distance")
-        public final NoTickViewDistanceSettings noTickViewDistance = new NoTickViewDistanceSettings();
-
-        public static class NoTickViewDistanceSettings extends ConfigSection {
-
-            @Entry(key = "enabled")
-            public final ConfigEntry<Boolean> enabled = new ConfigEntry<>();
-
-            @Entry(key = "global-chunk-count-target")
-            public final ConfigEntry<Integer> globalChunkCountTarget = new ConfigEntry<>();
-
-        }
 
         @Section(key = "alternative-reactive-mode-settings")
         public final AlternativeReactiveModeSettings alternativeReactiveModeSettings = new AlternativeReactiveModeSettings();
@@ -178,21 +190,6 @@ public class VdtConfig extends NabConfiguration {
 
         }
 
-        @SectionMap(key = "world-settings", defaultKey = "default")
-        public final ConfigSectionMap<World, WorldSettings> worldSettings = new ConfigSectionMap<>(World::getName, WorldSettings.class, true);
-
-        public static class WorldSettings extends ConfigSection {
-
-            @Entry(key = "exclude")
-            public final ConfigEntry<Boolean> exclude = new ConfigEntry<>();
-
-            @Entry(key = "minimum-no-tick-view-distance")
-            public final ConfigEntry<Integer> minimumNoTickViewDistance = new ConfigEntry<>();
-
-            @Entry(key = "maximum-no-tick-view-distance")
-            public final ConfigEntry<Integer> maximumNoTickViewDistance = new ConfigEntry<>();
-
-        }
     }
 
 }
