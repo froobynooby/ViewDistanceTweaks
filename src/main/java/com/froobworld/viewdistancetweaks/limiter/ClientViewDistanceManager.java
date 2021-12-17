@@ -1,6 +1,7 @@
 package com.froobworld.viewdistancetweaks.limiter;
 
 import com.froobworld.viewdistancetweaks.ViewDistanceTweaks;
+import com.froobworld.viewdistancetweaks.util.NmsUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -16,8 +17,10 @@ public class ClientViewDistanceManager implements Listener {
 
     public ClientViewDistanceManager(ViewDistanceTweaks viewDistanceTweaks) {
         this.viewDistanceTweaks = viewDistanceTweaks;
-        Bukkit.getOnlinePlayers().forEach(this::sendOptimisticViewDistance);
-        Bukkit.getPluginManager().registerEvents(this, viewDistanceTweaks);
+        if (NmsUtils.getMajorVersion() >= 1 && NmsUtils.getMinorVersion() >= 18) {
+            Bukkit.getOnlinePlayers().forEach(this::sendOptimisticViewDistance);
+            Bukkit.getPluginManager().registerEvents(this, viewDistanceTweaks);
+        }
     }
 
     public void preViewDistanceChange(World world, int newViewDistance) {

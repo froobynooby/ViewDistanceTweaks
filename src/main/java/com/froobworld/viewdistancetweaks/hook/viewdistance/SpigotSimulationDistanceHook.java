@@ -12,9 +12,13 @@ public class SpigotSimulationDistanceHook implements SimulationDistanceHook {
 
     @Override
     public int getDistance(World world) {
-        return on(world)
-                .call("getSimulationDistance")
-                .get();
+        if (NmsUtils.getMinorVersion() >= 18) {
+            return on(world)
+                    .call("getSimulationDistance")
+                    .get();
+        } else {
+            return world.getViewDistance();
+        }
     }
 
     @Override
