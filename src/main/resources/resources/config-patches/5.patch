@@ -53,3 +53,10 @@ comment=
 
 [comment-out]
 key=paper-settings.no-tick-view-distance
+
+[comment]
+key=paper-settings.world-settings
+comment= These settings are no longer used.
+
+[comment-out]
+key=paper-settings.world-settings
