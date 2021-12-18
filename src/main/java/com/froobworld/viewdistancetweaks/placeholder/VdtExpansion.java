@@ -57,24 +57,24 @@ public class VdtExpansion extends PlaceholderExpansion {
         ChunkCounter chunkCounter = viewDistanceTweaks.getHookManager().getChunkCounter();
         ViewDistanceHook viewDistanceHook = viewDistanceTweaks.getHookManager().getViewDistanceHook();
         ChunkCounter noTickChunkCounter = viewDistanceTweaks.getHookManager().getNoTickChunkCounter();
-        if (params.startsWith("view_distance")) {
+        if (params.startsWith("simulation_distance")) {
+            World world = null;
+
+            if (params.equalsIgnoreCase("simulation_distance")) {
+                world = player.getWorld();
+            } else if (params.startsWith("simulation_distance_")) {
+                world = Bukkit.getWorld(params.replace("simulation_distance_", ""));
+            }
+            return world == null ? null : ("" + simulationDistanceHook.getDistance(world));
+        }
+
+        if (viewDistanceHook != null && params.startsWith("view_distance")) {
             World world = null;
 
             if (params.equalsIgnoreCase("view_distance")) {
                 world = player.getWorld();
             } else if (params.startsWith("view_distance_")) {
-                world = Bukkit.getWorld(params.replace("view_distance_", ""));
-            }
-            return world == null ? null : ("" + simulationDistanceHook.getDistance(world));
-        }
-
-        if (viewDistanceHook != null && params.startsWith("no_tick_view_distance")) {
-            World world = null;
-
-            if (params.equalsIgnoreCase("no_tick_view_distance")) {
-                world = player.getWorld();
-            } else if (params.startsWith("no_tick_view_distance_")) {
-                world = Bukkit.getWorld(params.replace("no_tick_view_distance_", ""));
+                world = Bukkit.getWorld(params.replace("iew_distance_", ""));
             }
             return world == null ? null : ("" + viewDistanceHook.getDistance(world));
         }
