@@ -1,0 +1,40 @@
+name: Build ViewDistanceTweaks
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: 8
+          distribution: 'adopt'
+
+      - name: Check out NabConfiguration
+        uses: actions/checkout@v2
+        with:
+          repository: froobynooby/nab-configuration
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Install NabConfiguration
+        run: ./gradlew install
+
+      - name: Check out ViewDistanceTweaks
+        uses: actions/checkout@v2
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Build ViewDistanceTweaks
+        run: ./gradlew build
+
+      - name: Archive ViewDistanceTweaks
+        uses: actions/upload-artifact@v2
+        with:
+          path: build/libs/*.jar
+          name: ViewDistanceTweaks
