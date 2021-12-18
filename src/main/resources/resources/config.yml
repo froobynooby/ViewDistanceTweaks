@@ -17,20 +17,20 @@ adjustment-mode: mixed
 
 # These settings are for the proactive adjustment mode.
 proactive-mode-settings:
-  # Set this to the maximum chunk count your server can handle. The simulation distance of each world will be adjusted
-  # such that the total number of player-loaded chunks is sitting as close to this value as possible.
+  # Set this to the maximum ticking chunk count your server can handle. The simulation distance of each world will be
+  # adjusted such that the total number of player-loaded chunks is sitting as close to this value as possible.
   #  * If you know your server can handle up to p many players with a simulation distance of d, a reasonable choice is
   #    to set this to (2d + 1)^2 * p.
-  #  * As an example, 5780 is the number of player-loaded chunks for 20 players with a simulation distance of 8.
+  #  * As an example, 5780 is the number of player-loaded ticking chunks for 20 players with a simulation distance of 8.
   global-ticking-chunk-count-target: 5780
 
-  # Set this to the maximum number of chunks you want to be loaded by the view distance.
+  # Set this to the maximum number of non-ticking chunks you want to be loaded by the view distance.
   #  * Note: this only counts chunks that are outside of the simulation distance of a player, but within the view
   #    view distance of a player.
   #  * If you know your server can handle up to p many players with a view distance of v and a simulation distance of s,
   #    a reasonable choice is to set this to ((2v + 1)^2 - (2s + 1)^2) * p.
-  #  * As an example, 6720 is the number of chunks loaded by the view distance for 20 players with a view distance of 12
-  #    and a simulation distance of 8.
+  #  * As an example, 6720 is the number of non-ticking chunks loaded by the view distance for 20 players with a view
+  #    distance of 12 and a simulation distance of 8.
   global-non-ticking-chunk-count-target: 6720
 
 # These settings are for the reactive adjustment mode.
@@ -78,16 +78,16 @@ ticks-per-check: 600
 #    performance in the first few minutes following a restart.
 start-up-delay: 2400
 
-# How many checks in a row that say to increase the simulation distance should be required before the simulation or view
-# distance is actually increased?
+# How many checks in a row that say to increase the simulation or view distance should be required before an increase
+# actually occurs?
 #  * This is useful as it guards against the following kind of case: A player leaves and the view distance is
 #    increased, but the player returns three minutes later and the view distance is lowered to its previous value.
 #  * Since increasing the view distance can cause lag-spikes for players with poorer connections, it is
 #    recommended to keep this value relatively high.
 passed-checks-for-increase: 10
 
-# How many checks in a row that say to decrease the simulation distance should be required before the simulation or view
-# distance is actually decreased?
+# How many checks in a row that say to decrease the simulation or view distance should be required before a decrease
+# actually occurs?
 passed-checks-for-decrease: 1
 
 # Should we send a message to the console when we change the simulation or view distance?
