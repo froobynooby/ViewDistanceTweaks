@@ -3,7 +3,7 @@
 # Github: https://github.com/froobynooby/ViewDistanceTweaks
 
 # Please don't change this!
-version: 6
+version: 7
 
 # Set this to true to enable the plugin. The plugin is initially disabled so that you can make changes to the config
 # appropriate to your server.
@@ -130,8 +130,8 @@ world-settings:
 
     # These settings concern how we count the number of chunks in this world.
     chunk-counter-settings:
-      # When two players are near each other, their simulation distances can overlap. Should we not double count the
-      # chunks that are overlapping?
+      # When two players are near each other, the chunks they load can overlap. Should we not double count the chunks
+      # that are overlapping?
       exclude-overlap: true
 
 #  world_the_end:
@@ -150,7 +150,7 @@ paper-settings:
     # Should we use these alternative settings for reactive mode?
     use-alternative-settings: false
 
-    # Below what MSPT should we considering increasing the simulation distance?
+    # Below what MSPT should we consider increasing the simulation distance?
     increase-mspt-threshold: 40.0
 
     # Above what MSPT should we consider decreasing the simulation distance?

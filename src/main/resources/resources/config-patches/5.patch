@@ -45,7 +45,7 @@ to=proactive-mode-settings.global-non-ticking-chunk-count-target
 
 [comment]
 key=paper-settings.no-tick-view-distance
-comment=# These settings are no longer used.
+comment=# This setting is no longer used.
 
 [comment]
 key=paper-settings.no-tick-view-distance.enabled
@@ -53,4 +53,3 @@ comment=
 
 [comment-out]
 key=paper-settings.no-tick-view-distance
-

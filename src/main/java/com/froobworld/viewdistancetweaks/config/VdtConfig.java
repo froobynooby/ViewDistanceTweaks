@@ -11,7 +11,7 @@ import org.bukkit.World;
 import java.io.File;
 
 public class VdtConfig extends NabConfiguration {
-    public static final int VERSION = 6;
+    public static final int VERSION = 7;
 
     public VdtConfig(ViewDistanceTweaks viewDistanceTweaks) {
         super(
