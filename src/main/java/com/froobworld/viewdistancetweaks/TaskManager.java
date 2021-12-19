@@ -11,6 +11,9 @@ import com.froobworld.viewdistancetweaks.util.MsptTracker;
 import com.froobworld.viewdistancetweaks.util.TpsTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldLoadEvent;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,7 +25,7 @@ public class TaskManager {
     private ViewDistanceLimiter limiterTask;
     private ViewDistanceLimiter noTickLimiterTask;
     private ViewDistanceClamper simulationDistanceClamper;
-    private ViewDistanceClamper ViewDistanceClamper;
+    private ViewDistanceClamper viewDistanceClamper;
     private ManualViewDistanceManager manualSimulationDistanceManager;
     private ManualViewDistanceManager manualViewDistanceManager;
 
@@ -191,13 +194,24 @@ public class TaskManager {
                 .collect(Collectors.toList());
         ViewDistanceHook viewDistanceHook = viewDistanceTweaks.getHookManager().getViewDistanceHook();
         if (viewDistanceHook != null) {
-            ViewDistanceClamper = new ViewDistanceClamper(
+            viewDistanceClamper = new ViewDistanceClamper(
                     viewDistanceHook,
                     world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.maximumViewDistance.get(),
                     world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.minimumViewDistance.get()
             );
-            ViewDistanceClamper.clampWorlds(worldsToClamp);
+            viewDistanceClamper.clampWorlds(worldsToClamp);
         }
+        Bukkit.getPluginManager().registerEvents(new Listener() {
+            @EventHandler
+            void onWorldLoad(WorldLoadEvent event) {
+                if (!viewDistanceTweaks.getVdtConfig().worldSettings.of(event.getWorld()).simulationDistance.exclude.get()) {
+                    simulationDistanceClamper.clampWorld(event.getWorld());
+                }
+                if (viewDistanceClamper != null && !viewDistanceTweaks.getVdtConfig().worldSettings.of(event.getWorld()).viewDistance.exclude.get()) {
+                    viewDistanceClamper.clampWorld(event.getWorld());
+                }
+            }
+        }, viewDistanceTweaks);
     }
 
     public TpsTracker getTpsTracker() {
