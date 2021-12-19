@@ -2,8 +2,8 @@ package com.froobworld.viewdistancetweaks.placeholder;
 
 import com.froobworld.viewdistancetweaks.ViewDistanceTweaks;
 import com.froobworld.viewdistancetweaks.hook.tick.PaperTickHook;
+import com.froobworld.viewdistancetweaks.hook.viewdistance.SimulationDistanceHook;
 import com.froobworld.viewdistancetweaks.hook.viewdistance.ViewDistanceHook;
-import com.froobworld.viewdistancetweaks.hook.viewdistance.notick.NoTickViewDistanceHook;
 import com.froobworld.viewdistancetweaks.util.ChunkCounter;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
@@ -53,30 +53,30 @@ public class VdtExpansion extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(Player player, @NotNull String params) {
-        ViewDistanceHook viewDistanceHook = viewDistanceTweaks.getHookManager().getViewDistanceHook();
+        SimulationDistanceHook simulationDistanceHook = viewDistanceTweaks.getHookManager().getSimulationDistanceHook();
         ChunkCounter chunkCounter = viewDistanceTweaks.getHookManager().getChunkCounter();
-        NoTickViewDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook();
+        ViewDistanceHook viewDistanceHook = viewDistanceTweaks.getHookManager().getViewDistanceHook();
         ChunkCounter noTickChunkCounter = viewDistanceTweaks.getHookManager().getNoTickChunkCounter();
-        if (params.startsWith("view_distance")) {
+        if (params.startsWith("simulation_distance")) {
+            World world = null;
+
+            if (params.equalsIgnoreCase("simulation_distance")) {
+                world = player.getWorld();
+            } else if (params.startsWith("simulation_distance_")) {
+                world = Bukkit.getWorld(params.replace("simulation_distance_", ""));
+            }
+            return world == null ? null : ("" + simulationDistanceHook.getDistance(world));
+        }
+
+        if (viewDistanceHook != null && params.startsWith("view_distance")) {
             World world = null;
 
             if (params.equalsIgnoreCase("view_distance")) {
                 world = player.getWorld();
             } else if (params.startsWith("view_distance_")) {
-                world = Bukkit.getWorld(params.replace("view_distance_", ""));
+                world = Bukkit.getWorld(params.replace("iew_distance_", ""));
             }
-            return world == null ? null : ("" + viewDistanceHook.getViewDistance(world));
-        }
-
-        if (noTickViewDistanceHook != null && params.startsWith("no_tick_view_distance")) {
-            World world = null;
-
-            if (params.equalsIgnoreCase("no_tick_view_distance")) {
-                world = player.getWorld();
-            } else if (params.startsWith("no_tick_view_distance_")) {
-                world = Bukkit.getWorld(params.replace("no_tick_view_distance_", ""));
-            }
-            return world == null ? null : ("" + noTickViewDistanceHook.getViewDistance(world));
+            return world == null ? null : ("" + viewDistanceHook.getDistance(world));
         }
 
         if (params.startsWith("tick_chunk_count")) {
@@ -87,10 +87,10 @@ public class VdtExpansion extends PlaceholderExpansion {
             } else if (params.startsWith("tick_chunk_count_")) {
                 world = Bukkit.getWorld(params.replace("tick_chunk_count_", ""));
             }
-            return world == null ? null : ("" + (int) chunkCounter.countChunks(world, viewDistanceHook.getViewDistance(world)));
+            return world == null ? null : ("" + (int) chunkCounter.countChunks(world, simulationDistanceHook.getDistance(world)));
         }
 
-        if (noTickChunkCounter != null && noTickViewDistanceHook != null && params.startsWith("no_tick_chunk_count")) {
+        if (noTickChunkCounter != null && viewDistanceHook != null && params.startsWith("no_tick_chunk_count")) {
             World world = null;
 
             if (params.equalsIgnoreCase("no_tick_chunk_count")) {
@@ -98,7 +98,7 @@ public class VdtExpansion extends PlaceholderExpansion {
             } else if (params.startsWith("no_tick_chunk_count_")) {
                 world = Bukkit.getWorld(params.replace("no_tick_chunk_count_", ""));
             }
-            return world == null ? null : ("" + (int) noTickChunkCounter.countChunks(world, noTickViewDistanceHook.getViewDistance(world)));
+            return world == null ? null : ("" + (int) noTickChunkCounter.countChunks(world, viewDistanceHook.getDistance(world)));
         }
 
         if (params.startsWith("chunk_count")) {
@@ -109,21 +109,21 @@ public class VdtExpansion extends PlaceholderExpansion {
             } else if (params.startsWith("chunk_count_")) {
                 world = Bukkit.getWorld(params.replace("chunk_count_", ""));
             }
-            return world == null ? null : ("" + (noTickChunkCounter == null || noTickViewDistanceHook == null ? 0 : (int) noTickChunkCounter.countChunks(world, noTickViewDistanceHook.getViewDistance(world)) + (int) chunkCounter.countChunks(world, viewDistanceHook.getViewDistance(world))));
+            return world == null ? null : ("" + (noTickChunkCounter == null || viewDistanceHook == null ? 0 : (int) noTickChunkCounter.countChunks(world, viewDistanceHook.getDistance(world)) + (int) chunkCounter.countChunks(world, simulationDistanceHook.getDistance(world))));
         }
 
         if (params.equalsIgnoreCase("global_tick_chunk_count")) {
             int count = 0;
             for (World world : Bukkit.getWorlds()) {
-                count += chunkCounter.countChunks(world, viewDistanceHook.getViewDistance(world));
+                count += chunkCounter.countChunks(world, simulationDistanceHook.getDistance(world));
             }
             return "" + count;
         }
 
-        if (noTickChunkCounter != null && noTickViewDistanceHook != null && params.equalsIgnoreCase("global_no_tick_chunk_count")) {
+        if (noTickChunkCounter != null && viewDistanceHook != null && params.equalsIgnoreCase("global_no_tick_chunk_count")) {
             int count = 0;
             for (World world : Bukkit.getWorlds()) {
-                count += noTickChunkCounter.countChunks(world, noTickViewDistanceHook.getViewDistance(world));
+                count += noTickChunkCounter.countChunks(world, viewDistanceHook.getDistance(world));
             }
             return "" + count;
         }
@@ -131,9 +131,9 @@ public class VdtExpansion extends PlaceholderExpansion {
         if (params.equalsIgnoreCase("global_chunk_count")) {
             int count = 0;
             for (World world : Bukkit.getWorlds()) {
-                count += chunkCounter.countChunks(world, viewDistanceHook.getViewDistance(world));
-                if (noTickChunkCounter != null && noTickViewDistanceHook != null) {
-                    count += noTickChunkCounter.countChunks(world, noTickViewDistanceHook.getViewDistance(world));
+                count += chunkCounter.countChunks(world, simulationDistanceHook.getDistance(world));
+                if (noTickChunkCounter != null && viewDistanceHook != null) {
+                    count += noTickChunkCounter.countChunks(world, viewDistanceHook.getDistance(world));
                 }
             }
             return "" + count;

@@ -1,7 +1,7 @@
 package com.froobworld.viewdistancetweaks.limiter;
 
 import com.froobworld.viewdistancetweaks.ViewDistanceTweaks;
-import com.froobworld.viewdistancetweaks.hook.viewdistance.ViewDistanceHook;
+import com.froobworld.viewdistancetweaks.hook.viewdistance.SimulationDistanceHook;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
@@ -13,11 +13,11 @@ public class ManualViewDistanceManager {
     private final ViewDistanceTweaks viewDistanceTweaks;
     private final Map<UUID, Integer> worldTaskMap = new HashMap<>();
     private final Map<UUID, Integer> previousViewDistance = new HashMap<>();
-    private final ViewDistanceHook viewDistanceHook;
+    private final SimulationDistanceHook simulationDistanceHook;
 
-    public ManualViewDistanceManager(ViewDistanceTweaks viewDistanceTweaks, ViewDistanceHook viewDistanceHook) {
+    public ManualViewDistanceManager(ViewDistanceTweaks viewDistanceTweaks, SimulationDistanceHook simulationDistanceHook) {
         this.viewDistanceTweaks = viewDistanceTweaks;
-        this.viewDistanceHook = viewDistanceHook;
+        this.simulationDistanceHook = simulationDistanceHook;
     }
 
 
@@ -26,15 +26,15 @@ public class ManualViewDistanceManager {
             throw new IllegalArgumentException("Duration must be positive.");
         }
         if (!previousViewDistance.containsKey(world.getUID())) {
-            previousViewDistance.put(world.getUID(), viewDistanceHook.getViewDistance(world));
+            previousViewDistance.put(world.getUID(), simulationDistanceHook.getDistance(world));
         }
-        viewDistanceHook.setViewDistance(world, viewDistance);
+        simulationDistanceHook.setDistance(world, viewDistance);
         Integer lastTaskId = worldTaskMap.remove(world.getUID());
         if (lastTaskId != null) {
             Bukkit.getScheduler().cancelTask(lastTaskId);
         }
         worldTaskMap.put(world.getUID(), Bukkit.getScheduler().scheduleSyncDelayedTask(viewDistanceTweaks, () -> {
-            viewDistanceHook.setViewDistance(world, previousViewDistance.remove(world.getUID()));
+            simulationDistanceHook.setDistance(world, previousViewDistance.remove(world.getUID()));
             worldTaskMap.remove(world.getUID());
         }, durationTicks));
     }
@@ -49,7 +49,7 @@ public class ManualViewDistanceManager {
         }
         for (World world : Bukkit.getWorlds()) {
             if (previousViewDistance.containsKey(world.getUID())) {
-                viewDistanceHook.setViewDistance(world, previousViewDistance.get(world.getUID()));
+                simulationDistanceHook.setDistance(world, previousViewDistance.get(world.getUID()));
             }
         }
         worldTaskMap.clear();

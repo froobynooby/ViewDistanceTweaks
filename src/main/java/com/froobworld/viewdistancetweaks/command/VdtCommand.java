@@ -25,16 +25,16 @@ public class VdtCommand implements CommandExecutor {
                 return new ArrayList<>();
             }
             if (args.length == 1) {
-                List<String> possibleCompletions = new ArrayList<>(Arrays.asList("reload", "status", "rl", "stats", "set"));
-                if (viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook() != null) {
-                    possibleCompletions.add("set-no-tick");
+                List<String> possibleCompletions = new ArrayList<>(Arrays.asList("reload", "status", "rl", "stats", "simulationdistance"));
+                if (viewDistanceTweaks.getHookManager().getViewDistanceHook() != null) {
+                    possibleCompletions.add("viewdistance");
                 }
                 return StringUtil.copyPartialMatches(args[0], possibleCompletions, new ArrayList<>());
             }
-            if (args.length == 2 && (args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("set-no-tick"))) {
+            if (args.length == 2 && (args[0].equalsIgnoreCase("simulationdistance") || args[0].equalsIgnoreCase("viewdistance"))) {
                 return StringUtil.copyPartialMatches(args[1], IntStream.rangeClosed(2, 32).mapToObj(Integer::toString).collect(Collectors.toSet()), new ArrayList<>());
             }
-            if (args.length > 2 && (args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("set-no-tick"))) {
+            if (args.length > 2 && (args[0].equalsIgnoreCase("simulationdistance") || args[0].equalsIgnoreCase("viewdistance"))) {
                 if (Arrays.stream(args).noneMatch(s -> s.equalsIgnoreCase("--duration"))) {
                     return StringUtil.copyPartialMatches(args[args.length - 1], Collections.singletonList("--duration"), new ArrayList<>());
                 } else {
@@ -51,25 +51,25 @@ public class VdtCommand implements CommandExecutor {
     private ViewDistanceTweaks viewDistanceTweaks;
     private ReloadCommand reloadCommand;
     private StatusCommand statusCommand;
-    private SetCommand setCommand;
-    private SetCommand setNoTickCommand;
+    private SetCommand simulationDistanceCommand;
+    private SetCommand viewDistanceCommand;
 
     public VdtCommand(ViewDistanceTweaks viewDistanceTweaks) {
         this.viewDistanceTweaks = viewDistanceTweaks;
         reloadCommand = new ReloadCommand(viewDistanceTweaks);
         statusCommand = new StatusCommand(viewDistanceTweaks);
-        setCommand = new SetCommand(
+        simulationDistanceCommand = new SetCommand(
+                viewDistanceTweaks.getTaskManager()::getManualSimulationDistanceManager,
+                ChatColor.GRAY + "Set simulation distance of " + ChatColor.RED +  "{0}" + ChatColor.GRAY +
+                        " to " + ChatColor.RED + "{1}" + ChatColor.GRAY + " for " + ChatColor.RED + "{2}" + ChatColor.GRAY + " minutes.",
+                ChatColor.GRAY + "Set simulation distance of " + ChatColor.RED +  "{0}" + ChatColor.GRAY +
+                        " to " + ChatColor.RED + "{1}" + ChatColor.GRAY + " until next reload."
+        );
+        viewDistanceCommand = new SetCommand(
                 viewDistanceTweaks.getTaskManager()::getManualViewDistanceManager,
                 ChatColor.GRAY + "Set view distance of " + ChatColor.RED +  "{0}" + ChatColor.GRAY +
                         " to " + ChatColor.RED + "{1}" + ChatColor.GRAY + " for " + ChatColor.RED + "{2}" + ChatColor.GRAY + " minutes.",
                 ChatColor.GRAY + "Set view distance of " + ChatColor.RED +  "{0}" + ChatColor.GRAY +
-                        " to " + ChatColor.RED + "{1}" + ChatColor.GRAY + " until next reload."
-        );
-        setNoTickCommand = new SetCommand(
-                viewDistanceTweaks.getTaskManager()::getManualNoTickViewDistanceManager,
-                ChatColor.GRAY + "Set no-tick view distance of " + ChatColor.RED +  "{0}" + ChatColor.GRAY +
-                        " to " + ChatColor.RED + "{1}" + ChatColor.GRAY + " for " + ChatColor.RED + "{2}" + ChatColor.GRAY + " minutes.",
-                ChatColor.GRAY + "Set no-tick view distance of " + ChatColor.RED +  "{0}" + ChatColor.GRAY +
                         " to " + ChatColor.RED + "{1}" + ChatColor.GRAY + " until next reload."
         );
     }
@@ -94,16 +94,16 @@ public class VdtCommand implements CommandExecutor {
                     return true;
                 }
             }
-            if (args[0].equalsIgnoreCase("set")) {
-                if (CommandUtils.permissionCheck(sender, "viewdistancetweaks.vdt.command.set")) {
-                    return setCommand.onCommand(sender, command, cl, args);
+            if (args[0].equalsIgnoreCase("simulationdistance")) {
+                if (CommandUtils.permissionCheck(sender, "viewdistancetweaks.vdt.command.simulationdistance")) {
+                    return simulationDistanceCommand.onCommand(sender, command, cl, args);
                 } else {
                     return true;
                 }
             }
-            if (args[0].equalsIgnoreCase("set-no-tick") && viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook() != null) {
-                if (CommandUtils.permissionCheck(sender, "viewdistancetweaks.vdt.command.set-no-tick")) {
-                    return setNoTickCommand.onCommand(sender, command, cl, args);
+            if (args[0].equalsIgnoreCase("viewdistance") && viewDistanceTweaks.getHookManager().getViewDistanceHook() != null) {
+                if (CommandUtils.permissionCheck(sender, "viewdistancetweaks.vdt.command.viewdistance")) {
+                    return viewDistanceCommand.onCommand(sender, command, cl, args);
                 } else {
                     return true;
                 }
@@ -114,9 +114,9 @@ public class VdtCommand implements CommandExecutor {
         sender.sendMessage("");
         sender.sendMessage("/" + cl + " reload");
         sender.sendMessage("/" + cl + " status [--weight]");
-        sender.sendMessage("/" + cl + " set <view distance> [world] [--duration <minutes>]");
-        if (viewDistanceTweaks.getHookManager().getNoTickViewDistanceHook() != null) {
-            sender.sendMessage("/" + cl + " set-no-tick <view distance> [world] [--duration <minutes>]");
+        sender.sendMessage("/" + cl + " simulationdistance <view distance> [world] [--duration <minutes>]");
+        if (viewDistanceTweaks.getHookManager().getViewDistanceHook() != null) {
+            sender.sendMessage("/" + cl + " viewdistance <view distance> [world] [--duration <minutes>]");
         }
         return true;
     }

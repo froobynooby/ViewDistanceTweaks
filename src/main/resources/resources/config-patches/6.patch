@@ -1,0 +1,87 @@
+[comment]
+key=adjustment-mode
+comment=# How should we determine whether the simulation distance needs adjusting? Accepts three values:\n#  * proactive : Adjust the simulation distance so that the player-loaded chunk count is always below a set threshold.\n#  * reactive  : Adjust the simulation distance in response to changes in the server's TPS.\n#  * mixed     : Be both proactive and reactive; prioritising decreasing the simulation distance over increasing.
+
+[comment]
+key=proactive-mode-settings.global-ticking-chunk-count-target
+comment=# Set this to the maximum ticking chunk count your server can handle. The simulation distance of each world will be\n# adjusted such that the total number of player-loaded chunks is sitting as close to this value as possible.\n#  * If you know your server can handle up to p many players with a simulation distance of d, a reasonable choice is\n#    to set this to (2d + 1)^2 * p.\n#  * As an example, 5780 is the number of player-loaded ticking chunks for 20 players with a simulation distance of 8.
+
+[comment]
+key=proactive-mode-settings.global-non-ticking-chunk-count-target
+comment= # Set this to the maximum number of non-ticking chunks you want to be loaded by the view distance.\n#  * Note: this only counts chunks that are outside of the simulation distance of a player, but within the view\n#    view distance of a player.\n#  * If you know your server can handle up to p many players with a view distance of v and a simulation distance of s,\n#    a reasonable choice is to set this to ((2v + 1)^2 - (2s + 1)^2) * p.\n#  * As an example, 6720 is the number of non-ticking chunks loaded by the view distance for 20 players with a view\n#    distance of 12 and a simulation distance of 8.
+
+[comment]
+key=reactive-mode-settings.increase-tps-threshold
+comment=# Above what TPS should we consider increasing the simulation distance?
+
+[comment]
+key=reactive-mode-settings.decrease-tps-threshold
+comment=# Below what TPS should we consider decreasing the simulation distance?
+
+[comment]
+key=reactive-mode-settings.tps-prediction
+comment= # We keep a history of TPS vs. player-loaded chunk count in order to better predict what the TPS will settle to after\n# increasing the simulation distance.
+
+[comment]
+key=reactive-mode-settings.tps-prediction.enabled
+comment= # Should we use TPS prediction when we are considering increasing the simulation distance?\n#  * For example, we may be at 20 TPS with a simulation distance of 6, meaning we would consider increasing the\n#    simulation distance to 7. However, if we saw that 10 minutes ago with a simulation distance of 7 we had 17 TPS,\n#    we would hold off on increasing.\n#  * Disabling this can lead to a back-and-forth game of increasing and decreasing the simulation distance every few\n#    minutes - not ideal.
+
+[comment]
+key=ticks-per-check
+comment=# Every how many ticks should we check whether the simulation distance needs to be updated?
+
+[comment]
+key=passed-checks-for-increase
+comment=# How many checks in a row that say to increase the simulation or view distance should be required before an increase\n# actually occurs?\n#  * This is useful as it guards against the following kind of case: A player leaves and the view distance is\n#    increased, but the player returns three minutes later and the view distance is lowered to its previous value.\n#  * Since increasing the view distance can cause lag-spikes for players with poorer connections, it is\n#    recommended to keep this value relatively high.
+
+[comment]
+key=passed-checks-for-decrease
+comment=# How many checks in a row that say to decrease the simulation or view distance should be required before a decrease\n# actually occurs?
+
+[comment]
+key=world-settings.default.simulation-distance.exclude
+comment=# Should we not manage the simulation distance in this world?\n#  * Note: Even if excluded, the world's chunks will be counted for the purpose of adjusting the simulation distance\n#    of other worlds. If you do not want this, also be sure to set the chunk-weight to 0.
+
+[comment]
+key=world-settings.default.simulation-distance.minimum-simulation-distance
+comment=# What should the absolute minimum simulation distance be in this world?
+
+[comment]
+key=world-settings.default.simulation-distance.maximum-simulation-distance
+comment=# What should the absolute maximum simulation distance be in this world?
+
+[comment]
+key=world-settings.default.view-distance.exclude
+comment=# Should we not manage the view distance in this world?\n#  * Note: Even if excluded, the world's chunks will be counted for the purpose of adjusting the view distances\n#    of other worlds.
+
+[comment]
+key=world-settings.default.view-distance.minimum-view-distance
+comment=# What should the absolute minimum view distance be in this world?
+
+[comment]
+key=world-settings.default.view-distance.maximum-view-distance
+comment=# What should the absolute maximum view distance be in this world?
+
+[comment]
+key=world-settings.default.chunk-counter-settings.exclude-overlap
+comment=# When two players are near each other, the chunks they load can overlap. Should we not double count the chunks\n# that are overlapping?
+
+[comment]
+key=paper-settings.alternative-reactive-mode-settings
+comment=# These settings are an alternative option to the reactive-mode-settings, allowing simulation distance to be adjusted\n# based on MSPT rather than TPS.\n#  * MSPT stands for "milliseconds per tick", and tells you how long your server takes to tick on average. A server\n#    whose MSPT is above 50 will notice things slowing down, as the TPS drops.
+
+[comment]
+key=paper-settings.alternative-reactive-mode-settings.increase-mspt-threshold
+comment=# Below what MSPT should we consider increasing the simulation distance?
+
+[comment]
+key=paper-settings.alternative-reactive-mode-settings.decrease-mspt-threshold
+comment=# Above what MSPT should we consider decreasing the simulation distance?
+
+[comment]
+key=paper-settings.alternative-reactive-mode-settings.mspt-prediction
+comment=# We keep a history of MSPT vs. player-loaded chunk count in order to better predict what the MSPT will settle to\n# after increasing the simulation distance.
+
+[comment]
+key=paper-settings.alternative-reactive-mode-settings.mspt-prediction.enabled
+comment=# Should we use MSPT prediction when we are considering increasing the simulation distance?\n#  * For example, we may be at 38 MSPT with a simulation distance of 6, meaning we would consider increasing the\n#    simulation distance to 7. However, if we saw that 10 minutes ago with a simulation distance of 7 we had\n#    48 MSPT, we would hold off on increasing.\n#  * Disabling this can lead to a back-and-forth game of increasing and decreasing the simulation distance every\n#    few minutes - not ideal.

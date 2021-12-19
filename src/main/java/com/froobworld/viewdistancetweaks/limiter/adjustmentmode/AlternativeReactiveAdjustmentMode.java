@@ -1,6 +1,6 @@
 package com.froobworld.viewdistancetweaks.limiter.adjustmentmode;
 
-import com.froobworld.viewdistancetweaks.hook.viewdistance.ViewDistanceHook;
+import com.froobworld.viewdistancetweaks.hook.viewdistance.SimulationDistanceHook;
 import com.froobworld.viewdistancetweaks.util.ChunkCounter;
 import com.froobworld.viewdistancetweaks.util.MsptTracker;
 import org.bukkit.World;
@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 public class AlternativeReactiveAdjustmentMode extends BaseAdjustmentMode {
     private final MsptChunkHistory msptChunkHistory;
-    private final ViewDistanceHook viewDistanceHook;
+    private final SimulationDistanceHook simulationDistanceHook;
     private final MsptTracker msptTracker;
     private final ChunkCounter chunkCounter;
     private final double increaseMsptThreshold;
@@ -21,11 +21,11 @@ public class AlternativeReactiveAdjustmentMode extends BaseAdjustmentMode {
     private final boolean useMsptChunkHistory;
 
     public AlternativeReactiveAdjustmentMode(MsptTracker msptTracker, ChunkCounter chunkCounter, double increaseMsptThreshold, double decreaseMsptThreshold, long msptChunkHistoryLength,
-                                             boolean useMsptChunkHistory, ViewDistanceHook viewDistanceHook, Function<World, Boolean> exclude, Function<World, Integer> maxViewDistance,
+                                             boolean useMsptChunkHistory, SimulationDistanceHook simulationDistanceHook, Function<World, Boolean> exclude, Function<World, Integer> maxViewDistance,
                                              Function<World, Integer> minViewDistance, int requiredIncrease, int requiredDecrease) {
-        super(viewDistanceHook, exclude, maxViewDistance, minViewDistance, requiredIncrease, requiredDecrease);
+        super(simulationDistanceHook, exclude, maxViewDistance, minViewDistance, requiredIncrease, requiredDecrease);
         this.msptTracker = msptTracker;
-        this.viewDistanceHook = viewDistanceHook;
+        this.simulationDistanceHook = simulationDistanceHook;
         this.chunkCounter = chunkCounter;
         this.increaseMsptThreshold = increaseMsptThreshold;
         this.decreaseMsptThreshold = decreaseMsptThreshold;
@@ -38,7 +38,7 @@ public class AlternativeReactiveAdjustmentMode extends BaseAdjustmentMode {
         Map<World, Integer> chunkCounts = new HashMap<>();
         int totalCount = 0;
         for (World world : worlds) {
-            totalCount += chunkCounts.computeIfAbsent(world, w -> (int) chunkCounter.countChunks(w, viewDistanceHook.getViewDistance(world)));
+            totalCount += chunkCounts.computeIfAbsent(world, w -> (int) chunkCounter.countChunks(w, simulationDistanceHook.getDistance(world)));
         }
 
         double mspt = msptTracker.getMspt();
@@ -47,7 +47,7 @@ public class AlternativeReactiveAdjustmentMode extends BaseAdjustmentMode {
         int totalAdditionalChunks = 0;
         for (World world : worlds) {
             if (mspt <= increaseMsptThreshold) {
-                int additionalChunks = (int) chunkCounter.countChunks(world, viewDistanceHook.getViewDistance(world) + 1) - chunkCounts.get(world);
+                int additionalChunks = (int) chunkCounter.countChunks(world, simulationDistanceHook.getDistance(world) + 1) - chunkCounts.get(world);
                 if (useMsptChunkHistory && mspt + msptChunkHistory.getMaximumMsptPerChunk() * (totalAdditionalChunks + additionalChunks) >= decreaseMsptThreshold) {
                     adjustments.put(world, tryStay(world));
                 } else {

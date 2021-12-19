@@ -1,7 +1,7 @@
 package com.froobworld.viewdistancetweaks.limiter.adjustmentmode;
 
 import com.froobworld.viewdistancetweaks.util.ChunkCounter;
-import com.froobworld.viewdistancetweaks.hook.viewdistance.ViewDistanceHook;
+import com.froobworld.viewdistancetweaks.hook.viewdistance.SimulationDistanceHook;
 import org.bukkit.World;
 
 import java.util.Collection;
@@ -11,14 +11,14 @@ import java.util.function.Function;
 
 public class ProactiveAdjustmentMode extends BaseAdjustmentMode {
     private final int globalChunkCountTarget;
-    private final ViewDistanceHook viewDistanceHook;
+    private final SimulationDistanceHook simulationDistanceHook;
     private final ChunkCounter chunkCounter;
 
-    public ProactiveAdjustmentMode(int globalChunkCountTarget, ViewDistanceHook viewDistanceHook, ChunkCounter chunkCounter, Function<World, Boolean> exclude, Function<World, Integer> maxViewDistance,
+    public ProactiveAdjustmentMode(int globalChunkCountTarget, SimulationDistanceHook simulationDistanceHook, ChunkCounter chunkCounter, Function<World, Boolean> exclude, Function<World, Integer> maxViewDistance,
                                    Function<World, Integer> minViewDistance, int requiredForIncrease, int requiredForDecrease) {
-        super(viewDistanceHook, exclude, maxViewDistance, minViewDistance, requiredForIncrease, requiredForDecrease);
+        super(simulationDistanceHook, exclude, maxViewDistance, minViewDistance, requiredForIncrease, requiredForDecrease);
         this.globalChunkCountTarget = globalChunkCountTarget;
-        this.viewDistanceHook = viewDistanceHook;
+        this.simulationDistanceHook = simulationDistanceHook;
         this.chunkCounter = chunkCounter;
     }
 
@@ -27,14 +27,14 @@ public class ProactiveAdjustmentMode extends BaseAdjustmentMode {
         Map<World, Integer> chunkCounts = new HashMap<>();
         int totalCount = 0;
         for (World world : worlds) {
-            totalCount += chunkCounts.computeIfAbsent(world, w -> (int) chunkCounter.countChunks(w, viewDistanceHook.getViewDistance(world)));
+            totalCount += chunkCounts.computeIfAbsent(world, w -> (int) chunkCounter.countChunks(w, simulationDistanceHook.getDistance(world)));
         }
 
         Map<World, Adjustment> adjustments = new HashMap<>();
         for (World world : worlds) {
             int chunkCountDiff = 0;
             if (totalCount < globalChunkCountTarget) {
-                int newChunkCount = (int) chunkCounter.countChunks(world, viewDistanceHook.getViewDistance(world) + 1);
+                int newChunkCount = (int) chunkCounter.countChunks(world, simulationDistanceHook.getDistance(world) + 1);
                 int oldCount = chunkCounts.get(world);
                 Adjustment adjustment = tryIncrease(world);
 
@@ -50,7 +50,7 @@ public class ProactiveAdjustmentMode extends BaseAdjustmentMode {
                 Adjustment adjustment = tryDecrease(world);
                 adjustments.put(world, adjustment);
                 if (adjustment == Adjustment.DECREASE) {
-                    int newChunkCount = (int) chunkCounter.countChunks(world, viewDistanceHook.getViewDistance(world) - 1);
+                    int newChunkCount = (int) chunkCounter.countChunks(world, simulationDistanceHook.getDistance(world) - 1);
                     int oldCount = chunkCounts.get(world);
                     chunkCountDiff = newChunkCount - oldCount;
                 }

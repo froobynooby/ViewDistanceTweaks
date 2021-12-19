@@ -1,18 +1,18 @@
 package com.froobworld.viewdistancetweaks.util;
 
-import com.froobworld.viewdistancetweaks.hook.viewdistance.ViewDistanceHook;
+import com.froobworld.viewdistancetweaks.hook.viewdistance.SimulationDistanceHook;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.function.Function;
 
 public class NoTickChunkCounter implements ChunkCounter {
-    private final ViewDistanceHook viewDistanceHook;
+    private final SimulationDistanceHook simulationDistanceHook;
     private final Function<World, Double> chunkWeight;
     private final Function<World, Boolean> excludeOverlap;
 
-    public NoTickChunkCounter(ViewDistanceHook viewDistanceHook, Function<World, Double> chunkWeight, Function<World, Boolean> excludeOverlap) {
-        this.viewDistanceHook = viewDistanceHook;
+    public NoTickChunkCounter(SimulationDistanceHook simulationDistanceHook, Function<World, Double> chunkWeight, Function<World, Boolean> excludeOverlap) {
+        this.simulationDistanceHook = simulationDistanceHook;
         this.chunkWeight = chunkWeight;
         this.excludeOverlap = excludeOverlap;
     }
@@ -22,7 +22,7 @@ public class NoTickChunkCounter implements ChunkCounter {
     public double countChunks(World world, int noTickViewDistance) {
         double chunkWeight = this.chunkWeight.apply(world);
         boolean excludeOverlap = this.excludeOverlap.apply(world);
-        int viewDistance = viewDistanceHook.getViewDistance(world);
+        int viewDistance = simulationDistanceHook.getDistance(world);
         int diff = noTickViewDistance - viewDistance;
         if (diff <= 0) {
             return 0;
