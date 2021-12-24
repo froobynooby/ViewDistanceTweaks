@@ -26,6 +26,7 @@ public class TaskManager {
     private ViewDistanceLimiter noTickLimiterTask;
     private ViewDistanceClamper simulationDistanceClamper;
     private ViewDistanceClamper viewDistanceClamper;
+    private Listener clamperListener;
     private ManualViewDistanceManager manualSimulationDistanceManager;
     private ManualViewDistanceManager manualViewDistanceManager;
 
@@ -201,17 +202,20 @@ public class TaskManager {
             );
             viewDistanceClamper.clampWorlds(worldsToClamp);
         }
-        Bukkit.getPluginManager().registerEvents(new Listener() {
-            @EventHandler
-            void onWorldLoad(WorldLoadEvent event) {
-                if (!viewDistanceTweaks.getVdtConfig().worldSettings.of(event.getWorld()).simulationDistance.exclude.get()) {
-                    simulationDistanceClamper.clampWorld(event.getWorld());
+        if (clamperListener == null) {
+            clamperListener = new Listener() {
+                @EventHandler
+                void onWorldLoad(WorldLoadEvent event) {
+                    if (!viewDistanceTweaks.getVdtConfig().worldSettings.of(event.getWorld()).simulationDistance.exclude.get()) {
+                        simulationDistanceClamper.clampWorld(event.getWorld());
+                    }
+                    if (viewDistanceClamper != null && !viewDistanceTweaks.getVdtConfig().worldSettings.of(event.getWorld()).viewDistance.exclude.get()) {
+                        viewDistanceClamper.clampWorld(event.getWorld());
+                    }
                 }
-                if (viewDistanceClamper != null && !viewDistanceTweaks.getVdtConfig().worldSettings.of(event.getWorld()).viewDistance.exclude.get()) {
-                    viewDistanceClamper.clampWorld(event.getWorld());
-                }
-            }
-        }, viewDistanceTweaks);
+            };
+            Bukkit.getPluginManager().registerEvents(clamperListener, viewDistanceTweaks);
+        }
     }
 
     public TpsTracker getTpsTracker() {
