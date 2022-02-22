@@ -4,40 +4,35 @@ import com.froobworld.viewdistancetweaks.util.ViewDistanceUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
-import java.lang.reflect.InvocationTargetException;
-
-import static org.joor.Reflect.*;
-
-public class PaperSimulationDistanceHook extends SpigotSimulationDistanceHook {
+public class LegacyPaperSimulationDistanceHook extends SpigotSimulationDistanceHook {
 
     @Override
     public void setDistance(World world, int value) {
         value = ViewDistanceUtils.clampViewDistance(value);
         if (value != getDistance(world)) {
-            on(world).call("setSimulationDistance", value);
+            world.setViewDistance(value);
         }
     }
 
     public static boolean isCompatible() {
         try {
             Class.forName("org.bukkit.World")
-                    .getMethod("setSimulationDistance", int.class);
-        } catch (Exception exception) {
+                    .getDeclaredMethod("setViewDistance", int.class);
+        } catch (Exception e) {
             return false;
         }
         try {
+            Class.forName("org.bukkit.World")
+                    .getDeclaredMethod("setSimulationDistance", int.class);
+            return false;
+        } catch (Exception ignored) {}
+        try {
             for (World world : Bukkit.getWorlds()) {
-                try {
-                    on(world).call("setSimulationDistance", 0);
-                } catch (Exception exception) {
-                    if (exception instanceof InvocationTargetException) {
-                        throw exception.getCause();
-                    }
-                }
+                world.setViewDistance(0);
             }
         } catch (IllegalArgumentException e) {
             return true;
-        } catch (Throwable otherException) {
+        } catch (Exception otherException) {
             return false;
         }
         return true;

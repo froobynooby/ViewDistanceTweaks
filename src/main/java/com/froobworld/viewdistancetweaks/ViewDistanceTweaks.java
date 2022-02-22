@@ -65,6 +65,7 @@ public class ViewDistanceTweaks extends JavaPlugin {
     public void reload() throws Exception {
         vdtConfig.load();
         taskManager.reload();
+        clientViewDistanceManager.shutdown();
     }
 
     private void registerCommands() {

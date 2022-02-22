@@ -30,6 +30,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compileOnly 'com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.10.9'
+    compileOnly 'io.netty:netty-all:4.1.74.Final'
     compile 'org.jooq:joor-java-8:0.9.13'
     compile 'com.froobworld:nab-configuration:1.0.2'
     compile 'org.bstats:bstats-bukkit:2.2.1'
