@@ -91,7 +91,7 @@ public class TaskManager {
         AdjustmentMode reactiveAdjustmentMode = null;
         AdjustmentMode.Mode mode = viewDistanceTweaks.getVdtConfig().adjustmentMode.get();
         if (mode == AdjustmentMode.Mode.REACTIVE || mode == AdjustmentMode.Mode.MIXED) {
-            reactiveAdjustmentMode = new AlternativeReactiveAdjustmentMode(
+            reactiveAdjustmentMode = new ReactiveAdjustmentMode(
                     msptTracker,
                     viewDistanceTweaks.getHookManager().getChunkCounter(),
                     viewDistanceTweaks.getVdtConfig().reactiveMode.increaseMsptThreshold.get(),
