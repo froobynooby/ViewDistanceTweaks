@@ -79,6 +79,50 @@ public class VdtExpansion extends PlaceholderExpansion {
             return world == null ? null : ("" + viewDistanceHook.getDistance(world));
         }
 
+        if (params.startsWith("max_simulation_distance")) {
+            World world = null;
+
+            if (params.equalsIgnoreCase("max_simulation_distance")) {
+                world = player.getWorld();
+            } else if (params.startsWith("max_simulation_distance_")) {
+                world = Bukkit.getWorld(params.replace("max_simulation_distance_", ""));
+            }
+            return world == null ? null : ("" + viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.maximumSimulationDistance.get());
+        }
+
+        if (viewDistanceHook != null && params.startsWith("max_view_distance")) {
+            World world = null;
+
+            if (params.equalsIgnoreCase("max_view_distance")) {
+                world = player.getWorld();
+            } else if (params.startsWith("max_view_distance_")) {
+                world = Bukkit.getWorld(params.replace("max_view_distance_", ""));
+            }
+            return world == null ? null : ("" + viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.maximumViewDistance.get());
+        }
+
+        if (params.startsWith("min_simulation_distance")) {
+            World world = null;
+
+            if (params.equalsIgnoreCase("min_simulation_distance")) {
+                world = player.getWorld();
+            } else if (params.startsWith("min_simulation_distance_")) {
+                world = Bukkit.getWorld(params.replace("min_simulation_distance_", ""));
+            }
+            return world == null ? null : ("" + viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.minimumSimulationDistance.get());
+        }
+
+        if (viewDistanceHook != null && params.startsWith("min_view_distance")) {
+            World world = null;
+
+            if (params.equalsIgnoreCase("min_view_distance")) {
+                world = player.getWorld();
+            } else if (params.startsWith("min_view_distance_")) {
+                world = Bukkit.getWorld(params.replace("min_view_distance_", ""));
+            }
+            return world == null ? null : ("" + viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.minimumViewDistance.get());
+        }
+
         if (params.startsWith("tick_chunk_count")) {
             World world = null;
 
