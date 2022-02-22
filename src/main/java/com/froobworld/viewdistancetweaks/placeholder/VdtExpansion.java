@@ -74,7 +74,7 @@ public class VdtExpansion extends PlaceholderExpansion {
             if (params.equalsIgnoreCase("view_distance")) {
                 world = player.getWorld();
             } else if (params.startsWith("view_distance_")) {
-                world = Bukkit.getWorld(params.replace("iew_distance_", ""));
+                world = Bukkit.getWorld(params.replace("view_distance_", ""));
             }
             return world == null ? null : ("" + viewDistanceHook.getDistance(world));
         }
