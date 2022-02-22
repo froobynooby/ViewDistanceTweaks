@@ -60,12 +60,13 @@ public class ViewDistanceTweaks extends JavaPlugin {
     }
 
     @Override
-    public void onDisable() {}
+    public void onDisable() {
+        clientViewDistanceManager.shutdown();
+    }
 
     public void reload() throws Exception {
         vdtConfig.load();
         taskManager.reload();
-        clientViewDistanceManager.shutdown();
     }
 
     private void registerCommands() {
