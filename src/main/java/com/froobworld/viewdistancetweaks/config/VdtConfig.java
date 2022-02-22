@@ -11,7 +11,7 @@ import org.bukkit.World;
 import java.io.File;
 
 public class VdtConfig extends NabConfiguration {
-    public static final int VERSION = 7;
+    public static final int VERSION = 8;
 
     public VdtConfig(ViewDistanceTweaks viewDistanceTweaks) {
         super(
@@ -45,29 +45,26 @@ public class VdtConfig extends NabConfiguration {
 
     public static class ReactiveModeSettings extends ConfigSection {
 
-        @Entry(key = "decrease-tps-threshold")
-        public final ConfigEntry<Double> decreaseTpsThreshold = ConfigEntries.doubleEntry();
+        @Entry(key = "decrease-mspt-threshold")
+        public final ConfigEntry<Double> decreaseMsptThreshold = ConfigEntries.doubleEntry();
 
-        @Entry(key = "increase-tps-threshold")
-        public final ConfigEntry<Double> increaseTpsThreshold = ConfigEntries.doubleEntry();
+        @Entry(key = "increase-mspt-threshold")
+        public final ConfigEntry<Double> increaseMsptThreshold = ConfigEntries.doubleEntry();
 
-        @Section(key = "tps-prediction")
-        public final TpsPredictionSettings tpsPrediction = new TpsPredictionSettings();
+        @Section(key = "mspt-prediction")
+        public final ReactiveModeSettings.MsptPredictionSettings msptPrediction = new ReactiveModeSettings.MsptPredictionSettings();
 
-        @Section(key = "tps-tracker-settings")
-        public final TpsTrackerSettings tpsTracker = new TpsTrackerSettings();
+        @Section(key = "mspt-tracker-settings")
+        public final ReactiveModeSettings.MsptTrackerSettings msptTracker = new ReactiveModeSettings.MsptTrackerSettings();
 
-        public static class TpsTrackerSettings extends ConfigSection {
+        public static class MsptTrackerSettings extends ConfigSection {
 
             @Entry(key = "collection-period")
             public final ConfigEntry<Integer> collectionPeriod = ConfigEntries.integerEntry();
 
-            @Entry(key = "trim-outliers-to-within")
-            public final ConfigEntry<Double> trimOutliersPercent= ConfigEntries.doubleEntry();
-
         }
 
-        public static class TpsPredictionSettings extends ConfigSection {
+        public static class MsptPredictionSettings extends ConfigSection {
 
             @Entry(key = "enabled")
             public final ConfigEntry<Boolean> enabled = new ConfigEntry<>();
@@ -141,52 +138,6 @@ public class VdtConfig extends NabConfiguration {
 
             @Entry(key = "exclude-overlap")
             public final ConfigEntry<Boolean> excludeOverlap = new ConfigEntry<>();
-
-        }
-
-    }
-
-    @Section(key = "paper-settings")
-    public final PaperSettings paperSettings = new PaperSettings();
-
-    public static class PaperSettings extends ConfigSection {
-
-        @Section(key = "alternative-reactive-mode-settings")
-        public final AlternativeReactiveModeSettings alternativeReactiveModeSettings = new AlternativeReactiveModeSettings();
-
-        public static class AlternativeReactiveModeSettings extends ConfigSection {
-
-            @Entry(key = "use-alternative-settings")
-            public final ConfigEntry<Boolean> useAlternativeSettings = new ConfigEntry<>();
-
-            @Entry(key = "decrease-mspt-threshold")
-            public final ConfigEntry<Double> decreaseMsptThreshold = ConfigEntries.doubleEntry();
-
-            @Entry(key = "increase-mspt-threshold")
-            public final ConfigEntry<Double> increaseMsptThreshold = ConfigEntries.doubleEntry();
-
-            @Section(key = "mspt-prediction")
-            public final MsptPredictionSettings msptPrediction = new MsptPredictionSettings();
-
-            @Section(key = "mspt-tracker-settings")
-            public final MsptTrackerSettings msptTracker = new MsptTrackerSettings();
-
-            public static class MsptTrackerSettings extends ConfigSection {
-
-                @Entry(key = "collection-period")
-                public final ConfigEntry<Integer> collectionPeriod = ConfigEntries.integerEntry();
-
-            }
-
-            public static class MsptPredictionSettings extends ConfigSection {
-
-                @Entry(key = "enabled")
-                public final ConfigEntry<Boolean> enabled = new ConfigEntry<>();
-
-                @Entry(key = "history-length")
-                public final ConfigEntry<Long> historyLength = ConfigEntries.longEntry();
-
-            }
 
         }
 

@@ -1,0 +1,34 @@
+[comment]
+key=reactive-mode-settings
+comment=# These settings have been obsoleted. Use the new MSPT-based settings.
+
+[move]
+from=reactive-mode-settings
+to=old-reactive-mode-settings
+
+[comment-out]
+key=old-reactive-mode-settings
+
+[move]
+from=paper-settings.alternative-reactive-mode-settings.use-alternative-settings
+to=paper-settings.temporary
+
+[move]
+before=ticks-per-check
+from=paper-settings.alternative-reactive-mode-settings
+to=reactive-mode-settings
+
+[comment]
+key=reactive-mode-settings
+comment=# These settings are for the reactive adjustment mode.\n#  * MSPT stands for "milliseconds per tick", and tells you how long your server takes to tick on average. A server\n#    whose MSPT is above 50 will notice things slowing down, as the TPS drops.
+
+[move]
+from=paper-settings.temporary
+to=paper-settings.alternative-reactive-mode-settings.use-alternative-settings
+
+[comment]
+key=paper-settings
+comment=# These settings are no longer used.
+
+[comment-out]
+key=paper-settings

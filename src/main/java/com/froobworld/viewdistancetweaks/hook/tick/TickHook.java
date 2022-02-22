@@ -8,12 +8,8 @@ public interface TickHook {
 
     void register(ViewDistanceTweaks viewDistanceTweaks);
 
-    boolean addTickStartCallback(Consumer<Integer> consumer);
+    boolean addTickConsumer(Consumer<Long> consumer);
 
-    boolean removeTickStartCallback(Consumer<Integer> consumer);
-
-    boolean addTickEndCallback(Consumer<Integer> consumer);
-
-    boolean removeTickEndCallback(Consumer<Integer> consumer);
+    boolean removeTickConsumer(Consumer<Long> consumer);
 
 }

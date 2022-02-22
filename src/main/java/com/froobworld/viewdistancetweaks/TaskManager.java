@@ -1,6 +1,5 @@
 package com.froobworld.viewdistancetweaks;
 
-import com.froobworld.viewdistancetweaks.hook.tick.PaperTickHook;
 import com.froobworld.viewdistancetweaks.hook.viewdistance.SimulationDistanceHook;
 import com.froobworld.viewdistancetweaks.hook.viewdistance.ViewDistanceHook;
 import com.froobworld.viewdistancetweaks.limiter.ManualViewDistanceManager;
@@ -60,16 +59,14 @@ public class TaskManager {
 
     private void initTpsTracker() {
         tpsTracker = new TpsTracker(
-                viewDistanceTweaks.getVdtConfig().reactiveMode.tpsTracker.collectionPeriod.get(),
-                viewDistanceTweaks.getHookManager().getTickHook(),
-                viewDistanceTweaks.getVdtConfig().reactiveMode.tpsTracker.trimOutliersPercent.get()
+                viewDistanceTweaks.getHookManager().getTickHook()
         );
         tpsTracker.register();
     }
 
     private void initMsptTracker() {
         msptTracker = new MsptTracker(
-                viewDistanceTweaks.getVdtConfig().paperSettings.alternativeReactiveModeSettings.msptTracker.collectionPeriod.get(),
+                viewDistanceTweaks.getVdtConfig().reactiveMode.msptTracker.collectionPeriod.get(),
                 viewDistanceTweaks.getHookManager().getTickHook()
         );
         msptTracker.register();
@@ -94,37 +91,20 @@ public class TaskManager {
         AdjustmentMode reactiveAdjustmentMode = null;
         AdjustmentMode.Mode mode = viewDistanceTweaks.getVdtConfig().adjustmentMode.get();
         if (mode == AdjustmentMode.Mode.REACTIVE || mode == AdjustmentMode.Mode.MIXED) {
-            if (PaperTickHook.isCompatible() && viewDistanceTweaks.getVdtConfig().paperSettings.alternativeReactiveModeSettings.useAlternativeSettings.get()) {
-                reactiveAdjustmentMode = new AlternativeReactiveAdjustmentMode(
-                        msptTracker,
-                        viewDistanceTweaks.getHookManager().getChunkCounter(),
-                        viewDistanceTweaks.getVdtConfig().paperSettings.alternativeReactiveModeSettings.increaseMsptThreshold.get(),
-                        viewDistanceTweaks.getVdtConfig().paperSettings.alternativeReactiveModeSettings.decreaseMsptThreshold.get(),
-                        viewDistanceTweaks.getVdtConfig().paperSettings.alternativeReactiveModeSettings.msptPrediction.historyLength.get(),
-                        viewDistanceTweaks.getVdtConfig().paperSettings.alternativeReactiveModeSettings.msptPrediction.enabled.get(),
-                        viewDistanceTweaks.getHookManager().getSimulationDistanceHook(),
-                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.exclude.get(),
-                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.maximumSimulationDistance.get(),
-                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.minimumSimulationDistance.get(),
-                        viewDistanceTweaks.getVdtConfig().passedChecksForIncrease.get(),
-                        viewDistanceTweaks.getVdtConfig().passedChecksForDecrease.get()
-                );
-            } else {
-                reactiveAdjustmentMode = new ReactiveAdjustmentMode(
-                        tpsTracker,
-                        viewDistanceTweaks.getHookManager().getChunkCounter(),
-                        viewDistanceTweaks.getVdtConfig().reactiveMode.increaseTpsThreshold.get(),
-                        viewDistanceTweaks.getVdtConfig().reactiveMode.decreaseTpsThreshold.get(),
-                        viewDistanceTweaks.getVdtConfig().reactiveMode.tpsPrediction.historyLength.get(),
-                        viewDistanceTweaks.getVdtConfig().reactiveMode.tpsPrediction.enabled.get(),
-                        viewDistanceTweaks.getHookManager().getSimulationDistanceHook(),
-                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.exclude.get(),
-                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.maximumSimulationDistance.get(),
-                        world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.minimumSimulationDistance.get(),
-                        viewDistanceTweaks.getVdtConfig().passedChecksForIncrease.get(),
-                        viewDistanceTweaks.getVdtConfig().passedChecksForDecrease.get()
-                );
-            }
+            reactiveAdjustmentMode = new AlternativeReactiveAdjustmentMode(
+                    msptTracker,
+                    viewDistanceTweaks.getHookManager().getChunkCounter(),
+                    viewDistanceTweaks.getVdtConfig().reactiveMode.increaseMsptThreshold.get(),
+                    viewDistanceTweaks.getVdtConfig().reactiveMode.decreaseMsptThreshold.get(),
+                    viewDistanceTweaks.getVdtConfig().reactiveMode.msptPrediction.historyLength.get(),
+                    viewDistanceTweaks.getVdtConfig().reactiveMode.msptPrediction.enabled.get(),
+                    viewDistanceTweaks.getHookManager().getSimulationDistanceHook(),
+                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.exclude.get(),
+                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.maximumSimulationDistance.get(),
+                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.minimumSimulationDistance.get(),
+                    viewDistanceTweaks.getVdtConfig().passedChecksForIncrease.get(),
+                    viewDistanceTweaks.getVdtConfig().passedChecksForDecrease.get()
+            );
         }
         if (mode == AdjustmentMode.Mode.PROACTIVE || mode == AdjustmentMode.Mode.MIXED) {
             proactiveAdjustmentMode = new ProactiveAdjustmentMode(

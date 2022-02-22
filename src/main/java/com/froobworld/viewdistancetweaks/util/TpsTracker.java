@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Queue;
 import java.util.function.Consumer;
 
-public class TpsTracker implements Consumer<Integer> {
+public class TpsTracker implements Consumer<Long> {
     private final TickHook tickHook;
     private final int collectionPeriod;
     private final Queue<Double> tickDurations;
@@ -15,21 +15,21 @@ public class TpsTracker implements Consumer<Integer> {
     private double tickDurationSum;
     private final double trimToWithinRange;
 
-    public TpsTracker(int collectionPeriod, TickHook tickHook, double trimToWithinRange) {
+    public TpsTracker(TickHook tickHook) {
         this.tickHook = tickHook;
-        this.collectionPeriod = collectionPeriod <= 0 ? 1200 : collectionPeriod;
-        this.trimToWithinRange = trimToWithinRange / 100.0;
+        this.collectionPeriod = 1200;
+        this.trimToWithinRange = 50.0 / 100.0;
         tickDurations = new ArrayDeque<>(Collections.nCopies(collectionPeriod, 50.0));
         tickDurationSum = 50.0 * collectionPeriod;
     }
 
 
     public void register() {
-        tickHook.addTickStartCallback(this);
+        tickHook.addTickConsumer(this);
     }
 
     public void unregister() {
-        tickHook.removeTickStartCallback(this);
+        tickHook.removeTickConsumer(this);
         tickDurationSum = 0;
         lastTickTime = 0;
         tickDurations.clear();
@@ -44,7 +44,7 @@ public class TpsTracker implements Consumer<Integer> {
     }
 
     @Override
-    public void accept(Integer integer) {
+    public void accept(Long value) {
         long curTimeMillis = System.currentTimeMillis();
         double tickDuration = Math.min(Math.max(lastTickTime == 0 ? 50 : (curTimeMillis - lastTickTime), (1.0 - trimToWithinRange) * getAverageTickTime()), (1.0 + trimToWithinRange) * getAverageTickTime());
         tickDurationSum -= tickDurations.remove();
