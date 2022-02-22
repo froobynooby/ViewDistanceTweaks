@@ -27,12 +27,12 @@ public class MsptTracker {
         tickHook.addTickConsumer(tickConsumer);
     }
 
-    public void unregister() {
+    public synchronized void unregister() {
         tickHook.removeTickConsumer(tickConsumer);
         tickDurations.clear();
     }
 
-    public double getMspt() {
+    public synchronized double getMspt() {
         if (cachedMspt == null) {
             List<Long> sortedTickDurations = new ArrayList<>(tickDurations);
             sortedTickDurations.sort(null);
@@ -47,7 +47,7 @@ public class MsptTracker {
         return cachedMspt;
     }
 
-    private void onTickEnd(long tickDuration) {
+    private synchronized void onTickEnd(long tickDuration) {
         if (tickDurations.size() >= collectionPeriod) {
             tickDurations.remove();
         }

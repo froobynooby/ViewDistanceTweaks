@@ -28,14 +28,14 @@ public class TpsTracker implements Consumer<Long> {
         tickHook.addTickConsumer(this);
     }
 
-    public void unregister() {
+    public synchronized void unregister() {
         tickHook.removeTickConsumer(this);
         tickDurationSum = 0;
         lastTickTime = 0;
         tickDurations.clear();
     }
 
-    private double getAverageTickTime() {
+    private synchronized double getAverageTickTime() {
         return tickDurations.size() < collectionPeriod ? 50.0 : tickDurationSum / (double) collectionPeriod;
     }
 
@@ -44,7 +44,7 @@ public class TpsTracker implements Consumer<Long> {
     }
 
     @Override
-    public void accept(Long value) {
+    public synchronized void accept(Long value) {
         long curTimeMillis = System.currentTimeMillis();
         double tickDuration = Math.min(Math.max(lastTickTime == 0 ? 50 : (curTimeMillis - lastTickTime), (1.0 - trimToWithinRange) * getAverageTickTime()), (1.0 + trimToWithinRange) * getAverageTickTime());
         tickDurationSum -= tickDurations.remove();
