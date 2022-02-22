@@ -42,11 +42,11 @@ public class ViewDistanceTweaks extends JavaPlugin {
         }
         SpigotViewDistanceSyncer.syncSpigotViewDistances();
 
-        clientViewDistanceManager = new ClientViewDistanceManager(this);
         hookManager = new HookManager(this);
         hookManager.init();
         taskManager = new TaskManager(this);
         taskManager.init();
+        clientViewDistanceManager = new ClientViewDistanceManager(this);
         registerCommands();
         initMetrics();
 

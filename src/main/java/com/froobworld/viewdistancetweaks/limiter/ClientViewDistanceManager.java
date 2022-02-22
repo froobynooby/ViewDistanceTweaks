@@ -13,7 +13,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -82,14 +81,6 @@ public class ClientViewDistanceManager implements Listener {
         packetModifierMap.put(event.getPlayer(), packetModifier);
     }
 
-    @EventHandler
-    private void onPlayerQuit(PlayerQuitEvent event) {
-        ViewDistancePacketModifier packetModifier = packetModifierMap.remove(event.getPlayer());
-        if (packetModifier != null) {
-            packetModifier.remove();
-        }
-    }
-
     private static class ViewDistancePacketModifier extends ChannelDuplexHandler {
         private static final Class<?> viewDistancePacketClass = onClass("net.minecraft.network.protocol.game.PacketPlayOutViewDistance").type();
 
@@ -116,7 +107,7 @@ public class ClientViewDistanceManager implements Listener {
                     .field("a") // NetWorkManager
                     .field("k") // Channel
                     .call("pipeline")
-                    .call("addLast", "vdt_packet_handler", this);
+                    .call("remove", "vdt_packet_handler");
         }
 
         @Override
