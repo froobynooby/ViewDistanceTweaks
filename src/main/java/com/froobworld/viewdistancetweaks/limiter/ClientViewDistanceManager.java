@@ -29,6 +29,7 @@ public class ClientViewDistanceManager implements Listener {
         if (NmsUtils.getMajorVersion() >= 1 && NmsUtils.getMinorVersion() >= 18) {
             Bukkit.getOnlinePlayers().forEach(this::sendOptimisticViewDistance);
             Bukkit.getPluginManager().registerEvents(this, viewDistanceTweaks);
+            start();
         }
     }
 
