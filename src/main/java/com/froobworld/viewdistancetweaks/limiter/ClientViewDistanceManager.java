@@ -26,18 +26,17 @@ public class ClientViewDistanceManager implements Listener {
 
     public ClientViewDistanceManager(ViewDistanceTweaks viewDistanceTweaks) {
         this.viewDistanceTweaks = viewDistanceTweaks;
+    }
+
+    public void init() {
         if (NmsUtils.getMajorVersion() >= 1 && NmsUtils.getMinorVersion() >= 18) {
             Bukkit.getOnlinePlayers().forEach(this::sendOptimisticViewDistance);
             Bukkit.getPluginManager().registerEvents(this, viewDistanceTweaks);
-            start();
-        }
-    }
-
-    private void start() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            ViewDistancePacketModifier packetModifier = new ViewDistancePacketModifier(this, player);
-            packetModifier.inject();
-            packetModifierMap.put(player, packetModifier);
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                ViewDistancePacketModifier packetModifier = new ViewDistancePacketModifier(this, player);
+                packetModifier.inject();
+                packetModifierMap.put(player, packetModifier);
+            }
         }
     }
 
