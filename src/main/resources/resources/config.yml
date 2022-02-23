@@ -11,7 +11,7 @@ enabled: false
 
 # How should we determine whether the simulation distance needs adjusting? Accepts three values:
 #  * proactive : Adjust the simulation distance so that the player-loaded chunk count is always below a set threshold.
-#  * reactive  : Adjust the simulation distance in response to changes in the server's TPS.
+#  * reactive  : Adjust the simulation distance in response to changes in the server's MSPT.
 #  * mixed     : Be both proactive and reactive; prioritising decreasing the simulation distance over increasing.
 adjustment-mode: mixed
 

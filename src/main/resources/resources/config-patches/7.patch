@@ -32,3 +32,7 @@ comment=# These settings are no longer used.
 
 [comment-out]
 key=paper-settings
+
+[comment]
+key=adjustment-mode
+comment=# How should we determine whether the simulation distance needs adjusting? Accepts three values:\n#  * proactive : Adjust the simulation distance so that the player-loaded chunk count is always below a set threshold.\n#  * reactive  : Adjust the simulation distance in response to changes in the server's MSPT.\n#  * mixed     : Be both proactive and reactive; prioritising decreasing the simulation distance over increasing.
