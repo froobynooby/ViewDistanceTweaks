@@ -56,7 +56,7 @@ public class SpigotTickHook implements TickHook {
 
     @Override
     public boolean removeTickConsumer(Consumer<Long> consumer) {
-        return tickConsumers.add(consumer);
+        return tickConsumers.remove(consumer);
     }
 
     private long getLastTickTime() {
