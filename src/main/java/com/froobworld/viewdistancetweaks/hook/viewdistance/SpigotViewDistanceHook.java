@@ -44,7 +44,7 @@ public class SpigotViewDistanceHook implements ViewDistanceHook {
     }
 
     public static boolean isCompatible() {
-        return NmsUtils.getMajorVersion() == 1 && NmsUtils.getMinorVersion() == 18 && NmsUtils.getRevisionNumber() == 1;
+        return NmsUtils.getMajorVersion() == 1 && NmsUtils.getMinorVersion() == 18 && NmsUtils.getRevisionNumber() <= 2;
     }
 
 }

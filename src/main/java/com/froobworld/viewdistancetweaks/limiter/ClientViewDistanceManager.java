@@ -98,21 +98,40 @@ public class ClientViewDistanceManager implements Listener {
         }
 
         public void inject() {
-            on(player).call("getHandle")
-                    .field("b") // PlayerConnection
-                    .field("a") // NetWorkManager
-                    .field("k") // Channel
-                    .call("pipeline")
-                    .call("addLast", "vdt_packet_handler", this);
+            if (NmsUtils.getRevisionNumber() == 2) {
+                on(player).call("getHandle")
+                        .field("b") // PlayerConnection
+                        .field("a") // NetWorkManager
+                        .field("m") // Channel
+                        .call("pipeline")
+                        .call("addLast", "vdt_packet_handler", this);
+
+            } else if (NmsUtils.getRevisionNumber() == 1) {
+                on(player).call("getHandle")
+                        .field("b") // PlayerConnection
+                        .field("a") // NetWorkManager
+                        .field("k") // Channel
+                        .call("pipeline")
+                        .call("addLast", "vdt_packet_handler", this);
+            }
         }
 
         public void remove() {
-            on(player).call("getHandle")
-                    .field("b") // PlayerConnection
-                    .field("a") // NetWorkManager
-                    .field("k") // Channel
-                    .call("pipeline")
-                    .call("remove", "vdt_packet_handler");
+            if (NmsUtils.getRevisionNumber() == 2) {
+                on(player).call("getHandle")
+                        .field("b") // PlayerConnection
+                        .field("a") // NetWorkManager
+                        .field("m") // Channel
+                        .call("pipeline")
+                        .call("remove", "vdt_packet_handler");
+            } else if (NmsUtils.getRevisionNumber() == 1) {
+                on(player).call("getHandle")
+                        .field("b") // PlayerConnection
+                        .field("a") // NetWorkManager
+                        .field("k") // Channel
+                        .call("pipeline")
+                        .call("remove", "vdt_packet_handler");
+            }
         }
 
         @Override

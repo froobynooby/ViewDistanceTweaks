@@ -30,10 +30,17 @@ public class SpigotViewDistanceSyncer {
 
     private static int getProperSimulationDistance(World world) {
         if (NmsUtils.getMinorVersion() == 18) {
-            return on(world).call("getHandle")
-                    .call("k")
-                    .field("d") // ChunkMapDistance
-                    .field("t").get();
+            if (NmsUtils.getRevisionNumber() == 2) {
+                return on(world).call("getHandle")
+                        .call("k")
+                        .field("c")
+                        .field("t").get();
+            } else if (NmsUtils.getRevisionNumber() == 1) {
+                return on(world).call("getHandle")
+                        .call("k") // ChunkProviderServer
+                        .field("d") // ChunkMapDistance
+                        .field("t").get();
+            }
         } else if (NmsUtils.getMinorVersion() == 17) {
             return (int) on(world).call("getHandle")
                     .call("getChunkProvider")
@@ -50,10 +57,17 @@ public class SpigotViewDistanceSyncer {
 
     private static int getProperViewDistance(World world) {
         if (NmsUtils.getMinorVersion() == 18) {
-            return (int) on(world).call("getHandle")
-                    .call("k")
-                    .field("a")
-                    .field("L").get() - 1;
+            if (NmsUtils.getRevisionNumber() == 2) {
+                return (int) on(world).call("getHandle")
+                        .call("k")
+                        .field("a")
+                        .field("N").get() - 1;
+            } else if (NmsUtils.getRevisionNumber() == 1) {
+                return (int) on(world).call("getHandle")
+                        .call("k")
+                        .field("a")
+                        .field("L").get() - 1;
+            }
         }
         throw new IllegalStateException("Incompatible version");
     }
