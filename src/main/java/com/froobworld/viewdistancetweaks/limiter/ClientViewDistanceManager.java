@@ -124,32 +124,34 @@ public class ClientViewDistanceManager implements Listener {
         }
 
         public void remove() {
-            if (NmsUtils.getMinorVersion() == 19) {
-                on(player).call("getHandle")
-                        .field("b")
-                        .field("b")
-                        .field("m")
-                        .call("pipeline")
-                        .call("remove", "vdt_packet_handler");
-            } else if (NmsUtils.getMinorVersion() == 18) {
-                if (NmsUtils.getRevisionNumber() == 2) {
+            try {
+                if (NmsUtils.getMinorVersion() == 19) {
+                    on(player).call("getHandle")
+                            .field("b")
+                            .field("b")
+                            .field("m")
+                            .call("pipeline")
+                            .call("remove", "vdt_packet_handler");
+                } else if (NmsUtils.getMinorVersion() == 18) {
                     if (NmsUtils.getRevisionNumber() == 2) {
-                        on(player).call("getHandle")
-                                .field("b") // PlayerConnection
-                                .field("a") // NetWorkManager
-                                .field("m") // Channel
-                                .call("pipeline")
-                                .call("remove", "vdt_packet_handler");
-                    } else if (NmsUtils.getRevisionNumber() == 1) {
-                        on(player).call("getHandle")
-                                .field("b") // PlayerConnection
-                                .field("a") // NetWorkManager
-                                .field("k") // Channel
-                                .call("pipeline")
-                                .call("remove", "vdt_packet_handler");
+                        if (NmsUtils.getRevisionNumber() == 2) {
+                            on(player).call("getHandle")
+                                    .field("b") // PlayerConnection
+                                    .field("a") // NetWorkManager
+                                    .field("m") // Channel
+                                    .call("pipeline")
+                                    .call("remove", "vdt_packet_handler");
+                        } else if (NmsUtils.getRevisionNumber() == 1) {
+                            on(player).call("getHandle")
+                                    .field("b") // PlayerConnection
+                                    .field("a") // NetWorkManager
+                                    .field("k") // Channel
+                                    .call("pipeline")
+                                    .call("remove", "vdt_packet_handler");
+                        }
                     }
                 }
-            }
+            } catch (Exception ignored) {} // Throws an exception if pipeline does not contain the handler, in which case work is already done
         }
 
         @Override

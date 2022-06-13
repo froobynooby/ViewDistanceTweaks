@@ -62,7 +62,9 @@ public class ViewDistanceTweaks extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        clientViewDistanceManager.shutdown();
+        if (clientViewDistanceManager != null) {
+            clientViewDistanceManager.shutdown();
+        }
     }
 
     public void reload() throws Exception {
