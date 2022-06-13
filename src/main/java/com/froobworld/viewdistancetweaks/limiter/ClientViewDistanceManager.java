@@ -30,7 +30,7 @@ public class ClientViewDistanceManager implements Listener {
 
     public void init() {
         if (NmsUtils.getMajorVersion() >= 1 && NmsUtils.getMinorVersion() >= 18) {
-            Bukkit.getOnlinePlayers().forEach(this::sendOptimisticViewDistance);
+            Bukkit.getOnlinePlayers().forEach(player -> sendOptimisticViewDistance(player, viewDistanceTweaks.getHookManager().getViewDistanceHook().getDistance(player.getWorld())));
             Bukkit.getPluginManager().registerEvents(this, viewDistanceTweaks);
             for (Player player : Bukkit.getOnlinePlayers()) {
                 ViewDistancePacketModifier packetModifier = new ViewDistancePacketModifier(this, player);
@@ -46,19 +46,17 @@ public class ClientViewDistanceManager implements Listener {
     }
 
     public void preViewDistanceChange(World world, int newViewDistance) {
-        int maxWorldViewDistance = viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.maximumViewDistance.get();
-        world.getPlayers().forEach(player -> sendViewDistance(player, Math.max(maxWorldViewDistance, newViewDistance)));
+        world.getPlayers().forEach(player -> sendOptimisticViewDistance(player, newViewDistance));
     }
 
-    private int getOptimisticSendDistance(World world) {
+    private int getOptimisticSendDistance(World world, int worldViewDistance) {
         int modifier = viewDistanceTweaks.getHookManager().getViewDistanceHook() instanceof PaperViewDistanceHook ? 1 : 0;
-        int worldViewDistance = world.getViewDistance() + modifier;
         int maxWorldViewDistance = viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.maximumViewDistance.get() + modifier;
-        return Math.max(worldViewDistance, maxWorldViewDistance);
+        return Math.max(worldViewDistance, maxWorldViewDistance) + modifier;
     }
 
-    private void sendOptimisticViewDistance(Player player) {
-        sendViewDistance(player, getOptimisticSendDistance(player.getWorld()));
+    private void sendOptimisticViewDistance(Player player, int worldViewDistance) {
+        sendViewDistance(player, getOptimisticSendDistance(player.getWorld(), worldViewDistance));
     }
 
     private void sendViewDistance(Player player, int viewDistance) {
@@ -70,12 +68,12 @@ public class ClientViewDistanceManager implements Listener {
 
     @EventHandler
     private void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
-        sendOptimisticViewDistance(event.getPlayer());
+        sendOptimisticViewDistance(event.getPlayer(), viewDistanceTweaks.getHookManager().getViewDistanceHook().getDistance(event.getPlayer().getWorld()));
     }
 
     @EventHandler
     private void onPlayerJoin(PlayerJoinEvent event) {
-        sendOptimisticViewDistance(event.getPlayer());
+        sendOptimisticViewDistance(event.getPlayer(), viewDistanceTweaks.getHookManager().getViewDistanceHook().getDistance(event.getPlayer().getWorld()));
         ViewDistancePacketModifier packetModifier = new ViewDistancePacketModifier(this, event.getPlayer());
         packetModifier.inject();
         packetModifierMap.put(event.getPlayer(), packetModifier);
@@ -98,39 +96,59 @@ public class ClientViewDistanceManager implements Listener {
         }
 
         public void inject() {
-            if (NmsUtils.getRevisionNumber() == 2) {
+            if (NmsUtils.getMinorVersion() == 19) {
                 on(player).call("getHandle")
-                        .field("b") // PlayerConnection
-                        .field("a") // NetWorkManager
-                        .field("m") // Channel
+                        .field("b")
+                        .field("b")
+                        .field("m")
                         .call("pipeline")
                         .call("addLast", "vdt_packet_handler", this);
+            } else if (NmsUtils.getMinorVersion() == 18) {
+                if (NmsUtils.getRevisionNumber() == 2) {
+                    on(player).call("getHandle")
+                            .field("b") // PlayerConnection
+                            .field("a") // NetWorkManager
+                            .field("m") // Channel
+                            .call("pipeline")
+                            .call("addLast", "vdt_packet_handler", this);
 
-            } else if (NmsUtils.getRevisionNumber() == 1) {
-                on(player).call("getHandle")
-                        .field("b") // PlayerConnection
-                        .field("a") // NetWorkManager
-                        .field("k") // Channel
-                        .call("pipeline")
-                        .call("addLast", "vdt_packet_handler", this);
+                } else if (NmsUtils.getRevisionNumber() == 1) {
+                    on(player).call("getHandle")
+                            .field("b") // PlayerConnection
+                            .field("a") // NetWorkManager
+                            .field("k") // Channel
+                            .call("pipeline")
+                            .call("addLast", "vdt_packet_handler", this);
+                }
             }
         }
 
         public void remove() {
-            if (NmsUtils.getRevisionNumber() == 2) {
+            if (NmsUtils.getMinorVersion() == 19) {
                 on(player).call("getHandle")
-                        .field("b") // PlayerConnection
-                        .field("a") // NetWorkManager
-                        .field("m") // Channel
+                        .field("b")
+                        .field("b")
+                        .field("m")
                         .call("pipeline")
                         .call("remove", "vdt_packet_handler");
-            } else if (NmsUtils.getRevisionNumber() == 1) {
-                on(player).call("getHandle")
-                        .field("b") // PlayerConnection
-                        .field("a") // NetWorkManager
-                        .field("k") // Channel
-                        .call("pipeline")
-                        .call("remove", "vdt_packet_handler");
+            } else if (NmsUtils.getMinorVersion() == 18) {
+                if (NmsUtils.getRevisionNumber() == 2) {
+                    if (NmsUtils.getRevisionNumber() == 2) {
+                        on(player).call("getHandle")
+                                .field("b") // PlayerConnection
+                                .field("a") // NetWorkManager
+                                .field("m") // Channel
+                                .call("pipeline")
+                                .call("remove", "vdt_packet_handler");
+                    } else if (NmsUtils.getRevisionNumber() == 1) {
+                        on(player).call("getHandle")
+                                .field("b") // PlayerConnection
+                                .field("a") // NetWorkManager
+                                .field("k") // Channel
+                                .call("pipeline")
+                                .call("remove", "vdt_packet_handler");
+                    }
+                }
             }
         }
 
@@ -138,7 +156,7 @@ public class ClientViewDistanceManager implements Listener {
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
             if (msg.getClass().equals(viewDistancePacketClass)) {
                 int viewDistance = on(msg).get("a");
-                int newViewDistance = Math.max(viewDistance, clientViewDistanceManager.getOptimisticSendDistance(player.getWorld()));
+                int newViewDistance = clientViewDistanceManager.getOptimisticSendDistance(player.getWorld(), viewDistance);
                 on(msg).set("a", newViewDistance);
             }
             super.write(ctx, msg, promise);
