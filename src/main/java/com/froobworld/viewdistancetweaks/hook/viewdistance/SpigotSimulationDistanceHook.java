@@ -65,7 +65,9 @@ public class SpigotSimulationDistanceHook implements SimulationDistanceHook {
     }
 
     public static boolean isCompatible() {
-        return NmsUtils.getMajorVersion() == 1 && NmsUtils.getMinorVersion() <= 19 && NmsUtils.getRevisionNumber() <= 1;
+        return NmsUtils.getMajorVersion() == 1
+                && NmsUtils.getMinorVersion() <= 19 // no more than 1.19
+                && (NmsUtils.getRevisionNumber() < 19 || NmsUtils.getRevisionNumber() <= 1); // no more than 1.19 R1
     }
 
 }
