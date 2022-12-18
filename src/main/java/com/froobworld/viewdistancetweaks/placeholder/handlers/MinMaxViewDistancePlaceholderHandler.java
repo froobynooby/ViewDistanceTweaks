@@ -23,7 +23,7 @@ public class MinMaxViewDistancePlaceholderHandler extends PlaceholderHandler {
             World world = null;
 
             if (params.equalsIgnoreCase("max_view_distance")) {
-                world = player.getWorld();
+                world = getWorld(player);
             } else if (params.startsWith("max_view_distance_")) {
                 world = Bukkit.getWorld(params.replace("max_view_distance_", ""));
             }
@@ -32,7 +32,7 @@ public class MinMaxViewDistancePlaceholderHandler extends PlaceholderHandler {
             World world = null;
 
             if (params.equalsIgnoreCase("min_view_distance")) {
-                world = player.getWorld();
+                world = getWorld(player);
             } else if (params.startsWith("min_view_distance_")) {
                 world = Bukkit.getWorld(params.replace("min_view_distance_", ""));
             }

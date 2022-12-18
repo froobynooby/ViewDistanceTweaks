@@ -22,7 +22,7 @@ public class ViewDistancePlaceholderHandler extends PlaceholderHandler {
         World world = null;
 
         if (params.equalsIgnoreCase("view_distance")) {
-            world = player.getWorld();
+            world = getWorld(player);
         } else if (params.startsWith("view_distance_")) {
             world = Bukkit.getWorld(params.replace("view_distance_", ""));
         }

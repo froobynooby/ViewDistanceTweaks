@@ -22,7 +22,7 @@ public class SimulationDistancePlaceholderHandler extends PlaceholderHandler {
         World world = null;
 
         if (params.equalsIgnoreCase("simulation_distance")) {
-            world = player.getWorld();
+            world = getWorld(player);
         } else if (params.startsWith("simulation_distance_")) {
             world = Bukkit.getWorld(params.replace("simulation_distance_", ""));
         }

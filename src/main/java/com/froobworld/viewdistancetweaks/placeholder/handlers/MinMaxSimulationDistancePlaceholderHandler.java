@@ -23,7 +23,7 @@ public class MinMaxSimulationDistancePlaceholderHandler extends PlaceholderHandl
             World world = null;
 
             if (params.equalsIgnoreCase("max_simulation_distance")) {
-                world = player.getWorld();
+                world = getWorld(player);
             } else if (params.startsWith("max_simulation_distance_")) {
                 world = Bukkit.getWorld(params.replace("max_simulation_distance_", ""));
             }
@@ -32,7 +32,7 @@ public class MinMaxSimulationDistancePlaceholderHandler extends PlaceholderHandl
             World world = null;
 
             if (params.equalsIgnoreCase("min_simulation_distance")) {
-                world = player.getWorld();
+                world = getWorld(player);
             } else if (params.startsWith("min_simulation_distance_")) {
                 world = Bukkit.getWorld(params.replace("min_simulation_distance_", ""));
             }

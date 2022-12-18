@@ -32,7 +32,7 @@ public class ChunkCountPlaceholderHandler extends PlaceholderHandler {
             World world = null;
 
             if (params.equalsIgnoreCase("tick_chunk_count")) {
-                world = player.getWorld();
+                world = getWorld(player);
             } else if (params.startsWith("tick_chunk_count_")) {
                 world = Bukkit.getWorld(params.replace("tick_chunk_count_", ""));
             }
@@ -41,7 +41,7 @@ public class ChunkCountPlaceholderHandler extends PlaceholderHandler {
             World world = null;
 
             if (params.equalsIgnoreCase("no_tick_chunk_count")) {
-                world = player.getWorld();
+                world = getWorld(player);
             } else if (params.startsWith("no_tick_chunk_count_")) {
                 world = Bukkit.getWorld(params.replace("no_tick_chunk_count_", ""));
             }
@@ -50,7 +50,7 @@ public class ChunkCountPlaceholderHandler extends PlaceholderHandler {
             World world = null;
 
             if (params.equalsIgnoreCase("chunk_count")) {
-                world = player.getWorld();
+                world = getWorld(player);
             } else if (params.startsWith("chunk_count_")) {
                 world = Bukkit.getWorld(params.replace("chunk_count_", ""));
             }
