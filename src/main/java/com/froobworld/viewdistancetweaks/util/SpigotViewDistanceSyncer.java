@@ -30,7 +30,7 @@ public class SpigotViewDistanceSyncer {
 
     private static int getProperSimulationDistance(World world) {
         if (NmsUtils.getMinorVersion() == 19) {
-            if (NmsUtils.getRevisionNumber() == 1) {
+            if (NmsUtils.getRevisionNumber() <= 2) {
                 return on(world).call("getHandle")
                         .call("k")
                         .field("c")
@@ -69,6 +69,11 @@ public class SpigotViewDistanceSyncer {
                         .call("k")
                         .field("a")
                         .field("O").get() - 1;
+            } else if (NmsUtils.getRevisionNumber() == 2) {
+                return (int) on(world).call("getHandle")
+                        .call("k")
+                        .field("a")
+                        .field("P").get() - 1;
             }
         } else if (NmsUtils.getMinorVersion() == 18) {
             if (NmsUtils.getRevisionNumber() == 2) {
