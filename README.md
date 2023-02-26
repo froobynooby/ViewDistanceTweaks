@@ -11,7 +11,7 @@ View Distance Tweaks is a Spigot plugin that allows for dynamic per-world simula
 ```bash
 git clone https://github.com/froobynooby/nab-configuration
 cd nab-configuration
-./gradlew clean install
+./gradlew clean publishToMavenLocal
 ```
 2. Clone ViewDistanceTweaks and build
 ```bash
