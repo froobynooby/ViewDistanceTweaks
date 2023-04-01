@@ -97,12 +97,21 @@ public class ClientViewDistanceManager implements Listener {
 
         public void inject() {
             if (NmsUtils.getMinorVersion() == 19) {
-                on(player).call("getHandle")
-                        .field("b")
-                        .field("b")
-                        .field("m")
-                        .call("pipeline")
-                        .call("addLast", "vdt_packet_handler", this);
+                if (NmsUtils.getRevisionNumber() > 2) {
+                    on(player).call("getHandle")
+                            .field("b")
+                            .field("h")
+                            .field("m")
+                            .call("pipeline")
+                            .call("addLast", "vdt_packet_handler", this);
+                } else {
+                    on(player).call("getHandle")
+                            .field("b")
+                            .field("b")
+                            .field("m")
+                            .call("pipeline")
+                            .call("addLast", "vdt_packet_handler", this);
+                }
             } else if (NmsUtils.getMinorVersion() == 18) {
                 if (NmsUtils.getRevisionNumber() == 2) {
                     on(player).call("getHandle")
