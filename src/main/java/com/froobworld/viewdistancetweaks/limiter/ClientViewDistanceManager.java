@@ -61,9 +61,15 @@ public class ClientViewDistanceManager implements Listener {
 
     private void sendViewDistance(Player player, int viewDistance) {
         Object packet = onClass("net.minecraft.network.protocol.game.PacketPlayOutViewDistance").create(player.getWorld().getViewDistance()).create(viewDistance).get();
-        on(player).call("getHandle")
-                .field("b")
-                .call("a", packet);
+        if (NmsUtils.getMinorVersion() == 20) {
+            on(player).call("getHandle")
+                    .field("c")
+                    .call("a", packet);
+        } else {
+            on(player).call("getHandle")
+                    .field("b")
+                    .call("a", packet);
+        }
     }
 
     @EventHandler
@@ -96,7 +102,14 @@ public class ClientViewDistanceManager implements Listener {
         }
 
         public void inject() {
-            if (NmsUtils.getMinorVersion() == 19) {
+            if (NmsUtils.getMinorVersion() == 20) {
+                on(player).call("getHandle")
+                        .field("c")
+                        .field("h")
+                        .field("m")
+                        .call("pipeline")
+                        .call("addLast", "vdt_packet_handler", this);
+            } else if (NmsUtils.getMinorVersion() == 19) {
                 if (NmsUtils.getRevisionNumber() > 2) {
                     on(player).call("getHandle")
                             .field("b")
@@ -134,7 +147,14 @@ public class ClientViewDistanceManager implements Listener {
 
         public void remove() {
             try {
-                if (NmsUtils.getMinorVersion() == 19) {
+                if (NmsUtils.getMinorVersion() == 20) {
+                    on(player).call("getHandle")
+                            .field("c")
+                            .field("h")
+                            .field("m")
+                            .call("pipeline")
+                            .call("remove", "vdt_packet_handler");
+                } else if (NmsUtils.getMinorVersion() == 19) {
                     on(player).call("getHandle")
                             .field("b")
                             .field("b")

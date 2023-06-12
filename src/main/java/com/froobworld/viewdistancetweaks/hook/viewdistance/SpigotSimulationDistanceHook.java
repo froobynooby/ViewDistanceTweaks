@@ -26,7 +26,7 @@ public class SpigotSimulationDistanceHook implements SimulationDistanceHook {
         value = ViewDistanceUtils.clampViewDistance(value);
         if (value != getDistance(world)) {
             sendUpdatedSimulationDistance(world, value);
-            if (NmsUtils.getMinorVersion() == 18 || NmsUtils.getMinorVersion() == 19) {
+            if (NmsUtils.getMinorVersion() >= 18 && NmsUtils.getMinorVersion() <= 20) {
                 on(world).call("getHandle")
                         .call("k")
                         .call("b", value);
@@ -48,7 +48,11 @@ public class SpigotSimulationDistanceHook implements SimulationDistanceHook {
         }
 
         for (Player player : world.getPlayers()) {
-            if (NmsUtils.getMinorVersion() == 18 || NmsUtils.getMinorVersion() == 19) {
+            if (NmsUtils.getMinorVersion() == 20) {
+                on(player).call("getHandle")
+                        .field("c")
+                        .call("a", packet);
+            } else if (NmsUtils.getMinorVersion() == 18 || NmsUtils.getMinorVersion() == 19) {
                 on(player).call("getHandle")
                         .field("b")
                         .call("a", packet);
@@ -66,8 +70,8 @@ public class SpigotSimulationDistanceHook implements SimulationDistanceHook {
 
     public static boolean isCompatible() {
         return NmsUtils.getMajorVersion() == 1
-                && NmsUtils.getMinorVersion() <= 19 // no more than 1.19
-                && (NmsUtils.getRevisionNumber() < 19 || NmsUtils.getRevisionNumber() <= 3); // no more than 1.19 R3
+                && NmsUtils.getMinorVersion() <= 20 // no more than 1.20
+                && (NmsUtils.getRevisionNumber() < 1 || NmsUtils.getRevisionNumber() <= 1); // no more than 1.20 R1
     }
 
 }
