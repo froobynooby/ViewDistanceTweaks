@@ -18,7 +18,11 @@ public class SpigotViewDistanceHook implements ViewDistanceHook {
 
     @Override
     public int getDistance(World world) {
-        return world.getViewDistance();
+        int value = world.getViewDistance();
+        if (NmsUtils.getMinorVersion() >= 20 && (NmsUtils.getMinorVersion() > 20 || NmsUtils.getRevisionNumber() > 1)) { // 1.20 R2 or higher
+            value = value + 1;
+        }
+        return value;
     }
 
     @Override
@@ -47,7 +51,7 @@ public class SpigotViewDistanceHook implements ViewDistanceHook {
         return NmsUtils.getMajorVersion() == 1
                 && NmsUtils.getMinorVersion() >= 18 // at least 1.18
                 && NmsUtils.getMinorVersion() <= 20 // no more than 1.20
-                && (NmsUtils.getRevisionNumber() < 20 || NmsUtils.getRevisionNumber() <= 1); // no more than 1.20 R1
+                && (NmsUtils.getRevisionNumber() < 20 || NmsUtils.getRevisionNumber() <= 2); // no more than 1.20 R2
     }
 
 }
