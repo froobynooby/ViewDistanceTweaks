@@ -11,7 +11,7 @@ import org.bukkit.World;
 import java.io.File;
 
 public class VdtConfig extends NabConfiguration {
-    public static final int VERSION = 8;
+    public static final int VERSION = 9;
 
     public VdtConfig(ViewDistanceTweaks viewDistanceTweaks) {
         super(
@@ -51,11 +51,24 @@ public class VdtConfig extends NabConfiguration {
         @Entry(key = "increase-mspt-threshold")
         public final ConfigEntry<Double> increaseMsptThreshold = ConfigEntries.doubleEntry();
 
+        @Section(key = "reactive-view-distance")
+        public final ReactiveViewDistanceSettings reactiveViewDistance = new ReactiveModeSettings.ReactiveViewDistanceSettings();
+
         @Section(key = "mspt-prediction")
         public final ReactiveModeSettings.MsptPredictionSettings msptPrediction = new ReactiveModeSettings.MsptPredictionSettings();
 
         @Section(key = "mspt-tracker-settings")
         public final ReactiveModeSettings.MsptTrackerSettings msptTracker = new ReactiveModeSettings.MsptTrackerSettings();
+
+        public static class ReactiveViewDistanceSettings extends ConfigSection {
+
+            @Entry(key = "use-reactive-view-distance")
+            public final ConfigEntry<Boolean> useReactiveViewDistance = new ConfigEntry<>();
+
+            @Entry(key = "target-view-distance-ratio")
+            public final ConfigEntry<Double> targetViewDistanceRatio = ConfigEntries.doubleEntry();
+
+        }
 
         public static class MsptTrackerSettings extends ConfigSection {
 
