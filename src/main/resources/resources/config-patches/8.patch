@@ -1,0 +1,14 @@
+[add-section]
+before=mspt-tracker-settings
+key=reactive-mode-settings.reactive-view-distance
+comment=# These settings concern how view distance should be handled by reactive mode.
+
+[add-field]
+key = reactive-mode-settings.reactive-view-distance.use-reactive-view-distance
+value = false
+comment =# Should we adjust the view distance in reactive mode?\n#  * Note: If set to false, view distance will be adjusted as though proactive mode is active.
+
+[add-field]
+key=reactive-mode-settings.reactive-view-distance.target-view-distance-ratio
+value=2.0
+comment=# What ratio should we try to maintain between the view distance and simulation distance?\n#  * This prevents the simulation distance and view distance bunching up.\n#  * As an example, setting this to 2 would target a view distance which is at least 2x the simulation distance.
