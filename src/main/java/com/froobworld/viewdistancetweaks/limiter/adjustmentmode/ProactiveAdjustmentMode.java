@@ -23,7 +23,7 @@ public class ProactiveAdjustmentMode extends BaseAdjustmentMode {
     }
 
     @Override
-    public Map<World, Adjustment> getAdjustments(Collection<World> worlds) {
+    public Map<World, Adjustment> getAdjustments(Collection<World> worlds, boolean mutate) {
         Map<World, Integer> chunkCounts = new HashMap<>();
         int totalCount = 0;
         for (World world : worlds) {
@@ -36,7 +36,7 @@ public class ProactiveAdjustmentMode extends BaseAdjustmentMode {
             if (totalCount < globalChunkCountTarget) {
                 int newChunkCount = (int) chunkCounter.countChunks(world, simulationDistanceHook.getDistance(world) + 1);
                 int oldCount = chunkCounts.get(world);
-                Adjustment adjustment = tryIncrease(world);
+                Adjustment adjustment = tryIncrease(world, mutate);
 
                 if (totalCount + newChunkCount - oldCount <= globalChunkCountTarget) {
                     adjustments.put(world, adjustment);
@@ -47,7 +47,7 @@ public class ProactiveAdjustmentMode extends BaseAdjustmentMode {
                     adjustments.put(world, Adjustment.STAY);
                 }
             } else if (totalCount > globalChunkCountTarget) {
-                Adjustment adjustment = tryDecrease(world);
+                Adjustment adjustment = tryDecrease(world, mutate);
                 adjustments.put(world, adjustment);
                 if (adjustment == Adjustment.DECREASE) {
                     int newChunkCount = (int) chunkCounter.countChunks(world, simulationDistanceHook.getDistance(world) - 1);
@@ -55,7 +55,7 @@ public class ProactiveAdjustmentMode extends BaseAdjustmentMode {
                     chunkCountDiff = newChunkCount - oldCount;
                 }
             } else {
-                Adjustment adjustment = tryStay(world);
+                Adjustment adjustment = tryStay(world, mutate);
                 adjustments.put(world, adjustment);
             }
             totalCount += chunkCountDiff;

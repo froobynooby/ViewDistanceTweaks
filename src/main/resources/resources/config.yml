@@ -3,7 +3,7 @@
 # Github: https://github.com/froobynooby/ViewDistanceTweaks
 
 # Please don't change this!
-version: 8
+version: 9
 
 # Set this to true to enable the plugin. The plugin is initially disabled so that you can make changes to the config
 # appropriate to your server.
@@ -43,6 +43,17 @@ reactive-mode-settings:
 
   # Above what MSPT should we consider decreasing the simulation distance?
   decrease-mspt-threshold: 47.0
+
+  # These settings concern how view distance should be handled by reactive mode.
+  reactive-view-distance:
+    # Should we adjust the view distance in reactive mode?
+    #  * Note: If set to false, view distance will be adjusted as though proactive mode is active.
+    use-reactive-view-distance: true
+
+    # What ratio should we try to maintain between the view distance and simulation distance?
+    #  * This prevents the simulation distance and view distance bunching up.
+    #  * As an example, setting this to 2 would target a view distance which is at least 2x the simulation distance.
+    target-view-distance-ratio: 2.0
 
   # These settings concern how we determine the server's MSPT.
   #  * Only touch these settings if you know what you're doing.

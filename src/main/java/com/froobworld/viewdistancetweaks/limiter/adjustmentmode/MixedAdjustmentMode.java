@@ -19,9 +19,9 @@ public class MixedAdjustmentMode implements AdjustmentMode {
     }
 
     @Override
-    public Map<World, Adjustment> getAdjustments(Collection<World> worlds) {
-        Map<World, Adjustment> adjustments1 = adjustmentMode1.getAdjustments(worlds);
-        Map<World, Adjustment> adjustments2 = adjustmentMode2.getAdjustments(worlds);
+    public Map<World, Adjustment> getAdjustments(Collection<World> worlds, boolean mutate) {
+        Map<World, Adjustment> adjustments1 = adjustmentMode1.getAdjustments(worlds, mutate);
+        Map<World, Adjustment> adjustments2 = adjustmentMode2.getAdjustments(worlds, mutate);
 
         Map<World, Adjustment> finalAdjustments = new HashMap<>(adjustments1);
         for (Map.Entry<World, Adjustment> entry : adjustments2.entrySet()) {
