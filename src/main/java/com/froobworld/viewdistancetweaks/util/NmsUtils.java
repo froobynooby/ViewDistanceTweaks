@@ -11,7 +11,7 @@ public class NmsUtils {
             .type()
             .getPackage()
             .getName();
-    private static final String VERSION = Bukkit.getServer().getBukkitVersion().split("-")[0];//("[0-9]\\.[0-9]+(?:\\.[0-9+])?");//Bukkit.getServer().getClass().getPackage().getName().replace("org.bukkit.craftbukkit.", "");
+    private static final String VERSION = Bukkit.getServer().getBukkitVersion().split("-")[0];
     private static final boolean PRE_1_17 = NMS_PACKAGE_NAME.contains("1");
 
     public static String getFullyQualifiedClassName(String className, String post1_17PackageName) {
@@ -27,17 +27,17 @@ public class NmsUtils {
     }
 
     public static int getMajorVersion() {
-        String[] split = VERSION/*.replace("v", "").replace("R", "")*/.split(Pattern.quote("."));
+        String[] split = VERSION.split(Pattern.quote("."));
         return Integer.parseInt(split[0]);
     }
 
     public static int getMinorVersion() {
-        String[] split = VERSION/*.replace("v", "").replace("R", "")*/.split(Pattern.quote("."));
+        String[] split = VERSION.split(Pattern.quote("."));
         return split.length > 1 ? Integer.parseInt(split[1]) : 0;
     }
 
     public static int getRevisionNumber() {
-        String[] split = VERSION/*.replace("v", "").replace("R", "")*/.split(Pattern.quote("."));
+        String[] split = VERSION.split(Pattern.quote("."));
         return split.length > 2 ? Integer.parseInt(split[2]) : 0;
     }
 
