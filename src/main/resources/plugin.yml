@@ -2,7 +2,7 @@ name: ViewDistanceTweaks
 version: ${version}
 main: com.froobworld.viewdistancetweaks.ViewDistanceTweaks
 api-version: 1.14
-authors: [froobynooby]
+authors: [froobynooby,djpiper28]
 description: A plugin that allows for dynamic view distances.
 softdepend: [PlaceholderAPI]
 commands:

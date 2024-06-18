@@ -1,25 +1,25 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'com.github.johnrengelman.shadow' version '8.0.0'
     id 'java'
 }
 
 group 'com.froobworld'
-version '1.5.7'
-jar.enabled = false;
+version '1.6.0'
+jar.enabled = false
 
-sourceCompatibility = 1.8
+sourceCompatibility = 17
 
 repositories {
     mavenLocal();
     mavenCentral()
     maven {
-        url "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
+        url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
     }
     maven {
-        url "https://oss.sonatype.org/content/groups/public/"
+        url = "https://oss.sonatype.org/content/groups/public/"
     }
     maven {
-        url "https://papermc.io/repo/repository/maven-public/"
+        url = "https://papermc.io/repo/repository/maven-public/"
     }
     maven {
         url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
@@ -27,13 +27,13 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    compileOnly 'com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT'
-    compileOnly 'me.clip:placeholderapi:2.10.9'
-    compileOnly 'io.netty:netty-all:4.1.74.Final'
-    compile 'org.jooq:joor-java-8:0.9.14'
-    compile 'com.froobworld:nab-configuration:1.0.2'
-    compile 'org.bstats:bstats-bukkit:3.0.0'
+    testImplementation "org.junit.jupiter:junit-jupiter:5.9.3"
+    implementation "io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT"
+    implementation 'me.clip:placeholderapi:2.10.9'
+    implementation 'io.netty:netty-all:4.1.95.Final'
+
+    implementation 'org.jooq:joor-java-8:0.9.14'
+    implementation 'org.bstats:bstats-bukkit:3.0.2'
 }
 
 processResources {
