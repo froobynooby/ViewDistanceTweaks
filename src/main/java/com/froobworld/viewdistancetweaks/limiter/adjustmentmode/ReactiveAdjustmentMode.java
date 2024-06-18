@@ -34,7 +34,7 @@ public class ReactiveAdjustmentMode extends BaseAdjustmentMode {
     }
 
     @Override
-    public Map<World, Adjustment> getAdjustments(Collection<World> worlds) {
+    public Map<World, Adjustment> getAdjustments(Collection<World> worlds, boolean mutate) {
         Map<World, Integer> chunkCounts = new HashMap<>();
         int totalCount = 0;
         for (World world : worlds) {
@@ -49,18 +49,18 @@ public class ReactiveAdjustmentMode extends BaseAdjustmentMode {
             if (mspt <= increaseMsptThreshold) {
                 int additionalChunks = (int) chunkCounter.countChunks(world, simulationDistanceHook.getDistance(world) + 1) - chunkCounts.get(world);
                 if (useMsptChunkHistory && mspt + msptChunkHistory.getMaximumMsptPerChunk() * (totalAdditionalChunks + additionalChunks) >= decreaseMsptThreshold) {
-                    adjustments.put(world, tryStay(world));
+                    adjustments.put(world, tryStay(world, mutate));
                 } else {
-                    Adjustment adjustment = tryIncrease(world);
+                    Adjustment adjustment = tryIncrease(world, mutate);
                     adjustments.put(world, adjustment);
                     if (adjustment == Adjustment.INCREASE) {
                         totalAdditionalChunks += additionalChunks;
                     }
                 }
             } else if (mspt >= decreaseMsptThreshold) {
-                adjustments.put(world, tryDecrease(world));
+                adjustments.put(world, tryDecrease(world, mutate));
             } else {
-                adjustments.put(world, tryStay(world));
+                adjustments.put(world, tryStay(world, mutate));
             }
         }
         msptChunkHistory.purge();
