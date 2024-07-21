@@ -25,6 +25,7 @@ public class TaskManager {
     private ViewDistanceLimiter noTickLimiterTask;
     private ViewDistanceClamper simulationDistanceClamper;
     private ViewDistanceClamper viewDistanceClamper;
+    private AdjustmentModes adjustmentModes;
     private Listener clamperListener;
     private ManualViewDistanceManager manualSimulationDistanceManager;
     private ManualViewDistanceManager manualViewDistanceManager;
@@ -39,6 +40,8 @@ public class TaskManager {
         initMsptTracker();
         initViewDistanceClampers();
         initManualViewDistanceManagers();
+        adjustmentModes = new AdjustmentModes(viewDistanceTweaks);
+        adjustmentModes.init();
         initLimiterTask();
         initNoTickLimiterTask();
     }
@@ -87,45 +90,10 @@ public class TaskManager {
     }
 
     private void initLimiterTask() {
-        AdjustmentMode proactiveAdjustmentMode = null;
-        AdjustmentMode reactiveAdjustmentMode = null;
-        AdjustmentMode.Mode mode = viewDistanceTweaks.getVdtConfig().adjustmentMode.get();
-        if (mode == AdjustmentMode.Mode.REACTIVE || mode == AdjustmentMode.Mode.MIXED) {
-            reactiveAdjustmentMode = new ReactiveAdjustmentMode(
-                    msptTracker,
-                    viewDistanceTweaks.getHookManager().getChunkCounter(),
-                    viewDistanceTweaks.getVdtConfig().reactiveMode.increaseMsptThreshold.get(),
-                    viewDistanceTweaks.getVdtConfig().reactiveMode.decreaseMsptThreshold.get(),
-                    viewDistanceTweaks.getVdtConfig().reactiveMode.msptPrediction.historyLength.get(),
-                    viewDistanceTweaks.getVdtConfig().reactiveMode.msptPrediction.enabled.get(),
-                    viewDistanceTweaks.getHookManager().getSimulationDistanceHook(),
-                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.exclude.get(),
-                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.maximumSimulationDistance.get(),
-                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.minimumSimulationDistance.get(),
-                    viewDistanceTweaks.getVdtConfig().passedChecksForIncrease.get(),
-                    viewDistanceTweaks.getVdtConfig().passedChecksForDecrease.get()
-            );
-        }
-        if (mode == AdjustmentMode.Mode.PROACTIVE || mode == AdjustmentMode.Mode.MIXED) {
-            proactiveAdjustmentMode = new ProactiveAdjustmentMode(
-                    viewDistanceTweaks.getVdtConfig().proactiveMode.globalTickingChunkCountTarget.get(),
-                    viewDistanceTweaks.getHookManager().getSimulationDistanceHook(),
-                    viewDistanceTweaks.getHookManager().getChunkCounter(),
-                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.exclude.get(),
-                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.maximumSimulationDistance.get(),
-                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).simulationDistance.minimumSimulationDistance.get(),
-                    viewDistanceTweaks.getVdtConfig().passedChecksForIncrease.get(),
-                    viewDistanceTweaks.getVdtConfig().passedChecksForDecrease.get()
-            );
-        }
-        AdjustmentMode adjustmentMode = mode == AdjustmentMode.Mode.REACTIVE ? reactiveAdjustmentMode
-                : (mode == AdjustmentMode.Mode.PROACTIVE ? proactiveAdjustmentMode
-                : new MixedAdjustmentMode(proactiveAdjustmentMode, reactiveAdjustmentMode, AdjustmentMode.Adjustment::strongest));
-
         limiterTask = new ViewDistanceLimiter(
                 viewDistanceTweaks,
                 viewDistanceTweaks.getHookManager().getSimulationDistanceHook(),
-                adjustmentMode,
+                adjustmentModes.getSimulationDistanceAdjustmentMode(),
                 manualSimulationDistanceManager,
                 viewDistanceTweaks.getVdtConfig().logChanges.get(),
                 "Changed simulation distance of {0} ({1} -> {2})"
@@ -136,20 +104,10 @@ public class TaskManager {
     private void initNoTickLimiterTask() {
         SimulationDistanceHook noTickViewDistanceHook = viewDistanceTweaks.getHookManager().getViewDistanceHook();
         if (noTickViewDistanceHook != null) {
-            AdjustmentMode noTickAdjustmentMode = new ProactiveAdjustmentMode(
-                    viewDistanceTweaks.getVdtConfig().proactiveMode.globalNonTickingChunkCountTarget.get(),
-                    noTickViewDistanceHook,
-                    viewDistanceTweaks.getHookManager().getNoTickChunkCounter(),
-                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.exclude.get(),
-                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.maximumViewDistance.get(),
-                    world -> viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.minimumViewDistance.get(),
-                    viewDistanceTweaks.getVdtConfig().passedChecksForIncrease.get(),
-                    viewDistanceTweaks.getVdtConfig().passedChecksForDecrease.get()
-            );
             noTickLimiterTask = new ViewDistanceLimiter(
                     viewDistanceTweaks,
                     noTickViewDistanceHook,
-                    noTickAdjustmentMode,
+                    adjustmentModes.getViewDistanceAdjustmentMode(),
                     manualViewDistanceManager,
                     viewDistanceTweaks.getVdtConfig().logChanges.get(),
                     "Changed view distance of {0} ({1} -> {2})"

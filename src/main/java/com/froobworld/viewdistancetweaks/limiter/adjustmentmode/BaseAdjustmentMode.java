@@ -27,25 +27,24 @@ public abstract class BaseAdjustmentMode implements AdjustmentMode {
         this.requiredDecrease = requiredDecrease;
     }
 
-
-    public Adjustment tryIncrease(World world) {
+    protected Adjustment tryIncrease(World world, boolean mutate) {
         if (exclude.apply(world)) {
             return Adjustment.STAY;
         }
-        return getAdjustmentHistory(world).increase() < requiredIncrease ? Adjustment.STAY :
+        return getAdjustmentHistory(world).increase(mutate) < requiredIncrease ? Adjustment.STAY :
                 simulationDistanceHook.getDistance(world) < maximumViewDistance.apply(world) ? Adjustment.INCREASE : Adjustment.STAY;
     }
 
-    public Adjustment tryDecrease(World world) {
+    protected Adjustment tryDecrease(World world, boolean mutate) {
         if (exclude.apply(world)) {
             return Adjustment.STAY;
         }
-        return getAdjustmentHistory(world).decrease() < requiredDecrease ? Adjustment.STAY :
+        return getAdjustmentHistory(world).decrease(mutate) < requiredDecrease ? Adjustment.STAY :
                 simulationDistanceHook.getDistance(world) > minimumViewDistance.apply(world) ? Adjustment.DECREASE : Adjustment.STAY;
     }
 
-    public Adjustment tryStay(World world) {
-        getAdjustmentHistory(world).stay();
+    protected Adjustment tryStay(World world, boolean mutate) {
+        getAdjustmentHistory(world).stay(mutate);
         return Adjustment.STAY;
     }
 
@@ -57,19 +56,28 @@ public abstract class BaseAdjustmentMode implements AdjustmentMode {
         private int increaseCount;
         private int decreaseCount;
 
-        public int increase() {
+        public int increase(boolean mutate) {
+            if (!mutate) {
+                return increaseCount + 1;
+            }
             this.increaseCount++;
             this.decreaseCount = 0;
             return increaseCount;
         }
 
-        public int decrease() {
+        public int decrease(boolean mutate) {
+            if (!mutate) {
+                return increaseCount + 1;
+            }
             this.decreaseCount++;
             this.increaseCount = 0;
             return decreaseCount;
         }
 
-        public void stay() {
+        public void stay(boolean mutate) {
+            if (!mutate) {
+                return;
+            }
             this.increaseCount = 0;
             this.decreaseCount = 0;
         }
