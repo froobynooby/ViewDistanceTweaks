@@ -18,17 +18,17 @@ jobs:
         with:
           repository: froobynooby/nab-configuration
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: 21
-          distribution: 'temurin'
-
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
 
       - name: Install NabConfiguration
         run: ./gradlew install
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: 21
+          distribution: 'temurin'
 
       - name: Check out ViewDistanceTweaks
         uses: actions/checkout@v2
