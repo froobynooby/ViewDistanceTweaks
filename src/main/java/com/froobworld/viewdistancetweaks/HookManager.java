@@ -55,8 +55,6 @@ public class HookManager {
     public void init() {
         simulationDistanceHook = PreferenceChooser
                 .bestChoice(PaperSimulationDistanceHook::new, PaperSimulationDistanceHook::isCompatible)
-                .nextBestChoice(LegacyPaperSimulationDistanceHook::new, LegacyPaperSimulationDistanceHook::isCompatible)
-                .nextBestChoice(SpigotSimulationDistanceHook::new, SpigotSimulationDistanceHook::isCompatible)
                 .get();
         if (simulationDistanceHook == null) {
             throw new IllegalStateException("No simulation distance hook is available. Incompatible version?");
@@ -65,8 +63,6 @@ public class HookManager {
 
         viewDistanceHook = PreferenceChooser
                 .bestChoice(PaperViewDistanceHook::new, PaperViewDistanceHook::isCompatible)
-                .nextBestChoice(LegacyPaperViewDistanceHook::new, LegacyPaperViewDistanceHook::isCompatible)
-                .nextBestChoice(() -> new SpigotViewDistanceHook(viewDistanceTweaks.getClientViewDistanceManager()), SpigotViewDistanceHook::isCompatible)
                 .get();
         viewDistanceTweaks.getLogger().info(viewDistanceHook != null ?
                 "Using " + viewDistanceHook.getClass().getSimpleName() + " for the view distance hook." :

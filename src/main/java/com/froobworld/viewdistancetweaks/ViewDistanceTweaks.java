@@ -2,11 +2,9 @@ package com.froobworld.viewdistancetweaks;
 
 import com.froobworld.viewdistancetweaks.command.VdtCommand;
 import com.froobworld.viewdistancetweaks.config.VdtConfig;
-import com.froobworld.viewdistancetweaks.hook.viewdistance.SpigotSimulationDistanceHook;
 import com.froobworld.viewdistancetweaks.limiter.ClientViewDistanceManager;
 import com.froobworld.viewdistancetweaks.metrics.VdtMetrics;
 import com.froobworld.viewdistancetweaks.placeholder.VdtExpansion;
-import com.froobworld.viewdistancetweaks.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -51,9 +49,6 @@ public class ViewDistanceTweaks extends JavaPlugin {
         registerCommands();
         initMetrics();
 
-        if (hookManager.getSimulationDistanceHook().getClass().equals(SpigotSimulationDistanceHook.class)) {
-            SpigotViewDistanceSyncer.syncSpigotViewDistances();
-        }
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             if (new VdtExpansion(this).register()) {
                 getLogger().info("Registered expansion for PlaceholderAPI.");

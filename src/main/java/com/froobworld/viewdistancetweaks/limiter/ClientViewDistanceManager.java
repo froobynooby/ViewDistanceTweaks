@@ -1,13 +1,14 @@
 package com.froobworld.viewdistancetweaks.limiter;
 
 import com.froobworld.viewdistancetweaks.ViewDistanceTweaks;
-import com.froobworld.viewdistancetweaks.hook.viewdistance.PaperViewDistanceHook;
-import com.froobworld.viewdistancetweaks.util.NmsUtils;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import net.minecraft.network.protocol.game.ClientboundSetChunkCacheRadiusPacket;
+import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,8 +19,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.joor.Reflect.*;
-
 public class ClientViewDistanceManager implements Listener {
     private final ViewDistanceTweaks viewDistanceTweaks;
     private final Map<Player, ViewDistancePacketModifier> packetModifierMap = new HashMap<>();
@@ -29,14 +28,12 @@ public class ClientViewDistanceManager implements Listener {
     }
 
     public void init() {
-        if (NmsUtils.getMajorVersion() >= 1 && NmsUtils.getMinorVersion() >= 18) {
-            Bukkit.getOnlinePlayers().forEach(player -> sendOptimisticViewDistance(player, viewDistanceTweaks.getHookManager().getViewDistanceHook().getDistance(player.getWorld())));
-            Bukkit.getPluginManager().registerEvents(this, viewDistanceTweaks);
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                ViewDistancePacketModifier packetModifier = new ViewDistancePacketModifier(this, player);
-                packetModifier.inject();
-                packetModifierMap.put(player, packetModifier);
-            }
+        Bukkit.getOnlinePlayers().forEach(player -> sendOptimisticViewDistance(player, viewDistanceTweaks.getHookManager().getViewDistanceHook().getDistance(player.getWorld())));
+        Bukkit.getPluginManager().registerEvents(this, viewDistanceTweaks);
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            ViewDistancePacketModifier packetModifier = new ViewDistancePacketModifier(this, player);
+            packetModifier.inject();
+            packetModifierMap.put(player, packetModifier);
         }
     }
 
@@ -50,9 +47,8 @@ public class ClientViewDistanceManager implements Listener {
     }
 
     private int getOptimisticSendDistance(World world, int worldViewDistance) {
-        int modifier = viewDistanceTweaks.getHookManager().getViewDistanceHook() instanceof PaperViewDistanceHook ? 1 : 0;
-        int maxWorldViewDistance = viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.maximumViewDistance.get() + modifier;
-        return Math.max(worldViewDistance, maxWorldViewDistance) + modifier;
+        int maxWorldViewDistance = viewDistanceTweaks.getVdtConfig().worldSettings.of(world).viewDistance.maximumViewDistance.get();
+        return Math.max(worldViewDistance, maxWorldViewDistance);
     }
 
     private void sendOptimisticViewDistance(Player player, int worldViewDistance) {
@@ -60,22 +56,8 @@ public class ClientViewDistanceManager implements Listener {
     }
 
     private void sendViewDistance(Player player, int viewDistance) {
-        Object packet = onClass("net.minecraft.network.protocol.game.PacketPlayOutViewDistance").create(viewDistance).get();
-        if (NmsUtils.getMinorVersion() == 20) {
-            if (NmsUtils.getRevisionNumber() > 1) {
-                on(player).call("getHandle")
-                        .field("c")
-                        .call("b", packet);
-            } else {
-                on(player).call("getHandle")
-                        .field("c")
-                        .call("a", packet);
-            }
-        } else {
-            on(player).call("getHandle")
-                    .field("b")
-                    .call("a", packet);
-        }
+        ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
+        nmsPlayer.connection.send(new ClientboundSetChunkCacheRadiusPacket(viewDistance));
     }
 
     @EventHandler
@@ -97,7 +79,6 @@ public class ClientViewDistanceManager implements Listener {
     }
 
     private static class ViewDistancePacketModifier extends ChannelDuplexHandler {
-        private static final Class<?> viewDistancePacketClass = onClass("net.minecraft.network.protocol.game.PacketPlayOutViewDistance").type();
 
         private final ClientViewDistanceManager clientViewDistanceManager;
         private final Player player;
@@ -108,111 +89,25 @@ public class ClientViewDistanceManager implements Listener {
         }
 
         public void inject() {
-            if (NmsUtils.getMinorVersion() == 20) {
-                if (NmsUtils.getRevisionNumber() > 1) {
-                    on(player).call("getHandle")
-                            .field("c")
-                            .field("c")
-                            .field("n")
-                            .call("pipeline")
-                            .call("addLast", "vdt_packet_handler", this);
-                } else {
-                    on(player).call("getHandle")
-                            .field("c")
-                            .field("h")
-                            .field("m")
-                            .call("pipeline")
-                            .call("addLast", "vdt_packet_handler", this);
-                }
-            } else if (NmsUtils.getMinorVersion() == 19) {
-                if (NmsUtils.getRevisionNumber() > 2) {
-                    on(player).call("getHandle")
-                            .field("b")
-                            .field("h")
-                            .field("m")
-                            .call("pipeline")
-                            .call("addLast", "vdt_packet_handler", this);
-                } else {
-                    on(player).call("getHandle")
-                            .field("b")
-                            .field("b")
-                            .field("m")
-                            .call("pipeline")
-                            .call("addLast", "vdt_packet_handler", this);
-                }
-            } else if (NmsUtils.getMinorVersion() == 18) {
-                if (NmsUtils.getRevisionNumber() == 2) {
-                    on(player).call("getHandle")
-                            .field("b") // PlayerConnection
-                            .field("a") // NetWorkManager
-                            .field("m") // Channel
-                            .call("pipeline")
-                            .call("addLast", "vdt_packet_handler", this);
-
-                } else if (NmsUtils.getRevisionNumber() == 1) {
-                    on(player).call("getHandle")
-                            .field("b") // PlayerConnection
-                            .field("a") // NetWorkManager
-                            .field("k") // Channel
-                            .call("pipeline")
-                            .call("addLast", "vdt_packet_handler", this);
-                }
-            }
+            ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
+            nmsPlayer.connection.connection.channel.pipeline().addLast("vdt_packet_handler", this);
         }
 
         public void remove() {
             try {
-                if (NmsUtils.getMinorVersion() == 20) {
-                    if (NmsUtils.getRevisionNumber() > 1) {
-                        on(player).call("getHandle")
-                                .field("c")
-                                .field("c")
-                                .field("n")
-                                .call("pipeline")
-                                .call("remove", "vdt_packet_handler");
-                    } else {
-                        on(player).call("getHandle")
-                                .field("c")
-                                .field("h")
-                                .field("m")
-                                .call("pipeline")
-                                .call("remove", "vdt_packet_handler");
-                    }
-                } else if (NmsUtils.getMinorVersion() == 19) {
-                    on(player).call("getHandle")
-                            .field("b")
-                            .field("b")
-                            .field("m")
-                            .call("pipeline")
-                            .call("remove", "vdt_packet_handler");
-                } else if (NmsUtils.getMinorVersion() == 18) {
-                    if (NmsUtils.getRevisionNumber() == 2) {
-                        if (NmsUtils.getRevisionNumber() == 2) {
-                            on(player).call("getHandle")
-                                    .field("b") // PlayerConnection
-                                    .field("a") // NetWorkManager
-                                    .field("m") // Channel
-                                    .call("pipeline")
-                                    .call("remove", "vdt_packet_handler");
-                        } else if (NmsUtils.getRevisionNumber() == 1) {
-                            on(player).call("getHandle")
-                                    .field("b") // PlayerConnection
-                                    .field("a") // NetWorkManager
-                                    .field("k") // Channel
-                                    .call("pipeline")
-                                    .call("remove", "vdt_packet_handler");
-                        }
-                    }
-                }
+                ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
+                nmsPlayer.connection.connection.channel.pipeline().remove("vdt_packet_handler");
             } catch (Exception ignored) {} // Throws an exception if pipeline does not contain the handler, in which case work is already done
         }
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            if (msg.getClass().equals(viewDistancePacketClass)) {
-                int viewDistance = on(msg).get("a");
+            if (msg instanceof ClientboundSetChunkCacheRadiusPacket) {
+                int viewDistance = ((ClientboundSetChunkCacheRadiusPacket) msg).getRadius();
                 int newViewDistance = clientViewDistanceManager.getOptimisticSendDistance(player.getWorld(), viewDistance);
-                on(msg).set("a", newViewDistance);
+                if (viewDistance != newViewDistance) {
+                    msg = new ClientboundSetChunkCacheRadiusPacket(newViewDistance);
+                }
             }
             super.write(ctx, msg, promise);
         }

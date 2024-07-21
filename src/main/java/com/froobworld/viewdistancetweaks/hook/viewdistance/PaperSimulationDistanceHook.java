@@ -8,13 +8,18 @@ import java.lang.reflect.InvocationTargetException;
 
 import static org.joor.Reflect.*;
 
-public class PaperSimulationDistanceHook extends SpigotSimulationDistanceHook {
+public class PaperSimulationDistanceHook implements SimulationDistanceHook {
+
+    @Override
+    public int getDistance(World world) {
+        return world.getSimulationDistance();
+    }
 
     @Override
     public void setDistance(World world, int value) {
         value = ViewDistanceUtils.clampViewDistance(value);
         if (value != getDistance(world)) {
-            on(world).call("setSimulationDistance", value);
+            world.setSimulationDistance(value);
         }
     }
 

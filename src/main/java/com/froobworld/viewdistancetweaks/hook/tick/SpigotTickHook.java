@@ -1,10 +1,9 @@
 package com.froobworld.viewdistancetweaks.hook.tick;
 
 import com.froobworld.viewdistancetweaks.ViewDistanceTweaks;
-import com.froobworld.viewdistancetweaks.util.NmsUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.CraftServer;
 
-import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -14,25 +13,7 @@ import static org.joor.Reflect.*;
 public class SpigotTickHook implements TickHook {
     private static final long[] tickTimes;
     static {
-        Class<?> serverClass = null;
-        try {
-            serverClass = Class.forName(NmsUtils.getFullyQualifiedClassName("MinecraftServer", "server"));
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        if (serverClass == null) {
-            tickTimes = null;
-        } else {
-            String fieldName = null;
-            for (Field field : serverClass.getFields()) {
-                if (field.getType().equals(long[].class)) {
-                    fieldName = field.getName();
-                }
-            }
-            tickTimes = on(Bukkit.getServer())
-                    .call("getServer")
-                    .get(fieldName);
-        }
+        tickTimes = ((CraftServer) Bukkit.getServer()).getServer().getTickTimesNanos();
     }
 
     private final Set<Consumer<Long>> tickConsumers = new HashSet<>();
