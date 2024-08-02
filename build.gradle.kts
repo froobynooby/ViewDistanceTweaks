@@ -38,4 +38,10 @@ tasks {
         relocate("org.joor", "com.froobworld.viewdistancetweaks.lib.joor")
         relocate("org.bstats", "com.froobworld.viewdistancetweaks.lib.bstats")
     }
+
+    processResources {
+        filesMatching("plugin.yml") {
+            expand("version" to project.version)
+        }
+    }
 }
