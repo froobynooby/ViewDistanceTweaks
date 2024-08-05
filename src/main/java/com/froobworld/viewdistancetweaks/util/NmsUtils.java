@@ -28,17 +28,29 @@ public class NmsUtils {
 
     public static int getMajorVersion() {
         String[] split = VERSION.replace("v", "").replace("R", "").split(Pattern.quote("_"));
-        return Integer.parseInt(split[0]);
+        try {
+            return Integer.parseInt(split[0]);
+        } catch(NumberFormatException e) {
+            return 1;
+        }
     }
 
     public static int getMinorVersion() {
         String[] split = VERSION.replace("v", "").replace("R", "").split(Pattern.quote("_"));
-        return split.length > 1 ? Integer.parseInt(split[1]) : 0;
+        try {
+            return split.length > 1 ? Integer.parseInt(split[1]) : 0;
+        } catch(NumberFormatException e) {
+            return 20;
+        }
     }
 
     public static int getRevisionNumber() {
         String[] split = VERSION.replace("v", "").replace("R", "").split(Pattern.quote("_"));
-        return split.length > 2 ? Integer.parseInt(split[2]) : 0;
+        try {
+            return split.length > 2 ? Integer.parseInt(split[2]) : 0;
+        } catch(NumberFormatException e) {
+            return 0;
+        }
     }
 
 }
