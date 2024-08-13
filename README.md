@@ -17,7 +17,7 @@ cd nab-configuration
 ```bash
 git clone https://github.com/froobynooby/ViewDistanceTweaks
 cd ViewDistanceTweaks
-./gradlew clean build
+./gradlew clean shadowJar
 ```
 
 3. Find jar in `ViewDistanceTweaks/build/libs`
