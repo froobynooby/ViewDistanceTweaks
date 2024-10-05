@@ -7,7 +7,11 @@ import java.util.Map;
 
 public interface AdjustmentMode {
 
-    Map<World, Adjustment> getAdjustments(Collection<World> worlds);
+    Map<World, Adjustment> getAdjustments(Collection<World> worlds, boolean mutate);
+
+    default Map<World, Adjustment> getAdjustments(Collection<World> worlds) {
+        return getAdjustments(worlds, true);
+    }
 
     enum Adjustment {
         INCREASE,
