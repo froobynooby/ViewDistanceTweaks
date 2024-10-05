@@ -1,9 +1,4 @@
-# View Distance Tweaks
-
-**Plugin page**: [https://www.spigotmc.org/resources/75164/](https://www.spigotmc.org/resources/75164/)
-
-## About
-View Distance Tweaks is a Spigot plugin that allows for dynamic per-world simulation distance and view distance.
+ViewDistanceTweaks is a Paper plugin that allows for dynamic per-world simulation distance and view distance.
 
 ## Building
 
